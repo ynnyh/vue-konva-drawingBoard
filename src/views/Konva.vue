@@ -1,0 +1,877 @@
+<!--
+ * @Author: 月魂
+ * @Date: 2020-12-30 13:49:59
+ * @LastEditTime: 2021-01-08 14:15:49
+ * @LastEditors: 月魂
+ * @Description: 
+ * @FilePath: \demo\src\views\Konva.vue
+-->
+<template>
+  <div class="root">
+    <textarea
+      ref="textArea"
+      style="display: none"
+      @keydown="handleKeyDown"
+      @blur="handleBlur"
+    ></textarea>
+    <el-container>
+      <el-container>
+        <el-aside width="8%">
+          <el-row>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="箭头"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'arrow' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('arrow')"
+                >
+                  <use xlink:href="#icon-arrow"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="三角形"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'triangle' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('triangle')"
+                >
+                  <use xlink:href="#icon-triangle"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="四边形"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'rect' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('rect')"
+                >
+                  <use xlink:href="#icon-rect"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="五边形"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'pentagon' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('pentagon')"
+                >
+                  <use xlink:href="#icon-pentagon"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="六边形"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'hexagon' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('hexagon')"
+                >
+                  <use xlink:href="#icon-hexagon"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="椭圆"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'circle' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('circle')"
+                >
+                  <use xlink:href="#icon-circle"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="弧形"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'arc' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('arc')"
+                >
+                  <use xlink:href="#icon-arc"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="直线"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'line' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('line')"
+                >
+                  <use xlink:href="#icon-line"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+            <el-col :span="24">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="文字"
+                placement="right"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  style="font-size: 36px; cursor: pointer"
+                  v-bind:style="{
+                    color: this.arrowType === 'text' ? '#f20' : '',
+                  }"
+                  @click="changeArrowType('text')"
+                >
+                  <use xlink:href="#icon-text"></use>
+                </svg>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+        </el-aside>
+        <el-main>
+          <v-stage
+            ref="stage"
+            :config="configKonva"
+            @mousedown="handleMouseDown"
+            @mousemove="handleMouseMove"
+            @mouseup="handleMouseUp"
+            @click="handleClick"
+          >
+            <v-layer>
+              <v-rect
+                v-for="rect in rects"
+                :key="rect.name"
+                :config="{
+                  x: Math.min(rect.x, rect.x + rect.width),
+                  y: Math.min(rect.y, rect.y + rect.height),
+                  width: Math.abs(rect.width),
+                  height: Math.abs(rect.height),
+                  fillEnable: false,
+                  stroke: '#000',
+                  strokeWidth: 1,
+                  name: rect.name,
+                  id: 'rect',
+                  scaleX: rect.scaleX,
+                  scaleY: rect.scaleY,
+                  draggable: rect.draggable,
+                }"
+              >
+              </v-rect>
+              <v-ellipse
+                v-for="cir in circles"
+                :key="cir.name"
+                :config="{
+                  x: cir.x,
+                  y: cir.y,
+                  radiusX: Math.abs(cir.radiusX),
+                  radiusY: Math.abs(cir.radiusY),
+                  stroke: '#000',
+                  strokeWidth: 1,
+                  name: cir.name,
+                  scaleX: cir.scaleX,
+                  scaleY: cir.scaleY,
+                  draggable: cir.draggable,
+                  fillEnable: false,
+                }"
+              ></v-ellipse>
+              <v-regular-polygon
+                v-for="triangle in triangles"
+                :key="triangle.name"
+                :config="{
+                  x: triangle.x,
+                  y: triangle.y,
+                  sides: 3,
+                  radius: Math.abs(triangle.radius),
+                  strokeWidth: 1,
+                  name: triangle.name,
+                  scaleX: triangle.scaleX,
+                  scaleY: triangle.scaleY,
+                  draggable: triangle.draggable,
+                  fillEnable: false,
+                  stroke: 'black',
+                }"
+              ></v-regular-polygon>
+              <v-regular-polygon
+                v-for="pentagon in pentagons"
+                :key="pentagon.name"
+                :config="{
+                  x: pentagon.x,
+                  y: pentagon.y,
+                  sides: 5,
+                  radius: Math.abs(pentagon.radius),
+                  strokeWidth: 1,
+                  name: pentagon.name,
+                  scaleX: pentagon.scaleX,
+                  scaleY: pentagon.scaleY,
+                  draggable: pentagon.draggable,
+                  fillEnable: false,
+                  stroke: 'black',
+                }"
+              ></v-regular-polygon>
+              <v-regular-polygon
+                v-for="hexagon in hexagons"
+                :key="hexagon.name"
+                :config="{
+                  x: hexagon.x,
+                  y: hexagon.y,
+                  sides: 6,
+                  radius: Math.abs(hexagon.radius),
+                  strokeWidth: 1,
+                  name: hexagon.name,
+                  scaleX: hexagon.scaleX,
+                  scaleY: hexagon.scaleY,
+                  draggable: hexagon.draggable,
+                  fillEnable: false,
+                  stroke: 'black',
+                }"
+              ></v-regular-polygon>
+              <v-arc
+                v-for="arc in arcs"
+                :key="arc.name"
+                :config="{
+                  x: arc.x,
+                  y: arc.y,
+                  innerRadius: Math.abs(arc.innerRadius),
+                  outerRadius: Math.abs(arc.outerRadius),
+                  angle: arc.angle,
+                  name: arc.name,
+                  stroke: 'black',
+                  scaleX: arc.scaleX,
+                  scaleY: arc.scaleY,
+                  draggable: arc.draggable,
+                  strokeWidth: 1,
+                  fillEnable: false,
+                }"
+              ></v-arc>
+              <v-line
+                v-for="line in lines"
+                :key="line.name"
+                :config="{
+                  points: line.points,
+                  name: line.name,
+                  stroke: 'red',
+                  strokeWidth: 15,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  scaleX: line.scaleX,
+                  scaleY: line.scaleY,
+                  draggable: line.draggable,
+                }"
+              ></v-line>
+              <v-text
+                v-for="text in texts"
+                :key="text.name"
+                @dblclick="editText"
+                :config="{
+                  x: text.x,
+                  y: text.y,
+                  text: 'hello world',
+                  fontSize: Math.abs(text.fontSize),
+                  fontFamily: 'Calibri',
+                  name: text.name,
+                  fill: '#555',
+                  scaleX: text.scaleX,
+                  scaleY: text.scaleY,
+                  draggable: text.draggable,
+                }"
+              ></v-text>
+              <v-rect
+                :config="{
+                  ...this.rectBox,
+                  stroke: '#1D83FF',
+                  strokeWidth: 0.8,
+                  fill: 'rgba(29, 131, 255, .2)',
+                  listening: false,
+                  id: 'selectBox',
+                }"
+                ref="rectBox"
+              ></v-rect>
+              <v-transformer ref="transformer" />
+            </v-layer>
+          </v-stage>
+        </el-main>
+        <el-aside width="8%">右侧属性栏</el-aside>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+<script>
+import Konva from 'konva'
+const kWidth = document.body.clientWidth * 0.84
+const kHeight = window.innerHeight
+let x1, y1, x2, y2
+let transformerNode = ''
+export default {
+  name: 'konva',
+  data () {
+    return {
+      isDrawing: false, // 判断是否绘制的字段
+      arrowType: 'arrow', // 判断要绘制的图形
+      down: false, // 检测鼠标是否按下
+      configKonva: {
+        width: kWidth,
+        height: kHeight
+      },
+      rects: [],
+      circles: [],
+      triangles: [],
+      pentagons: [],
+      hexagons: [],
+      arcs: [],
+      lines: [],
+      texts: [],
+      selectedShapeName: '', // 点击选中的图形名称
+      keyCode: 0, // 监听键盘按下值
+      rectBox: { // 画布上矩形选择框
+        visible: false,
+        width: 0,
+        height: 0,
+        x: 0,
+        y: 0,
+      },
+    }
+  },
+  mounted () {
+    window.addEventListener('keydown', this.onKeyDown) // 此处可以参考下面click中如何获取到keyCode
+    window.addEventListener('keyup', this.onKeyUp)
+  },
+  destroyed () {
+    window.removeEventListener('keydown', this.onKeyDown)
+    window.removeEventListener('keydown', this.onKeyUp)
+  },
+  methods: {
+    onKeyDown (e) {
+      //  此处keydown的场景影响到了textarea的正常输入
+      this.keyCode = e.keyCode
+    },
+    onKeyUp (e) {
+      e.preventDefault()
+      this.keyCode = 0
+    },
+    changeArrowType (type) { // 切换操作类型，可以是普通箭头，可以是形状生成工具
+      this.arrowType = type
+    },
+    // updateTransformer () { // 寻找选中的元素
+    //   transformerNode = this.$refs.transformer.getNode()
+    //   const stage = transformerNode.getStage()
+    //   const { selectedShapeName } = this
+    //   const selectedNode = stage.findOne('.' + selectedShapeName)
+    //   if (selectedNode === transformerNode.node()) return // 如果已被选中则不做操作
+    //   if (selectedNode) {
+    //     transformerNode.nodes([selectedNode])
+    //   } else {
+    //     transformerNode.nodes([])
+    //   }
+    //   transformerNode.getLayer().batchDraw()
+    // },
+
+    // 鼠标down
+    handleMouseDown (e) {
+      if (e.target !== e.target.getStage()) return
+      this.down = true
+      this.isDrawing = true
+      if (this.arrowType === 'arrow') { // 如果是普通箭头则具有选择图形能力
+        // 点击画布本身，清空选择框
+        if (e.target === e.target.getStage()) {
+          // 矩形选择框，批量选择图形
+          x1 = this.$refs.stage.getNode().getPointerPosition().x
+          y1 = this.$refs.stage.getNode().getPointerPosition().y
+          x2 = this.$refs.stage.getNode().getPointerPosition().x
+          y2 = this.$refs.stage.getNode().getPointerPosition().y
+
+          this.rectBox = {
+            visible: true,
+            width: 0,
+            height: 0,
+            x: 0,
+            y: 0,
+          }
+          // this.selectedShapeName = ''
+          // this.updateTransformer()
+          transformerNode = this.$refs.transformer.getNode()
+          transformerNode.getLayer().draw()
+          return
+        }
+
+        // 点击选中的图形，不做操作
+        // const clickedOnTransformer = e.target.getParent().className === 'Transformer'
+        // if (clickedOnTransformer) return
+        // // 通过图形name精准定位
+        // const name = e.target.name()
+        // const shape = name.split('-')[0]
+        // let item = ''
+        // if (shape === 'rect') {
+        //   item = this.rects.find(r => r.name === name)
+        // } else if (shape === 'circle') {
+        //   item = this.circles.find(r => r.name === name)
+        // }
+        // if (item) {
+        //   this.selectedShapeName = name
+        // } else {
+        //   this.selectedShapeName = ''
+        // }
+        // this.updateTransformer()
+      } else if (this.arrowType === 'rect') { // 如果是点击矩形按钮，则可以绘制矩形
+        // this.isDrawing = true
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.now()
+        this.setShape([
+          ...this.rects,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            width: 0,
+            height: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'rect-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'circle') {
+        // this.isDrawing = true
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.circles,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            radiusX: 0,
+            radiusY: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'circle-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'triangle') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.triangles,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            radius: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'triangle-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'pentagon') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.pentagons,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            radius: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'pentagon-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'hexagon') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.hexagons,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            radius: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'hexagon-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'arc') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.arcs,
+          {
+            x: Number(pos.x),
+            y: Number(pos.y),
+            innerRadius: 0,
+            outerRadius: 0,
+            draggable: true,
+            angle: 0,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'arc-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'line') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.lines,
+          {
+            points: [Number(pos.x), Number(pos.y),],
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'line-' + nowDate,
+          },
+        ])
+      } else if (this.arrowType === 'text') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        const nowDate = Date.parse(new Date())
+        this.setShape([
+          ...this.texts,
+          {
+            x: pos.x,
+            y: pos.y,
+            fontSize: 0,
+            draggable: true,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+            name: 'text-' + nowDate,
+          },
+        ])
+      }
+    },
+    handleMouseMove (e) {
+      if (!this.isDrawing) return
+      if (this.arrowType === 'arrow') {
+        if (!this.rectBox.visible) return
+        x2 = this.$refs.stage.getNode().getPointerPosition().x
+        y2 = this.$refs.stage.getNode().getPointerPosition().y
+        this.rectBox = {
+          x: Math.min(x1, x2),
+          y: Math.min(y1, y2),
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+          visible: true,
+        }
+        transformerNode.getLayer().batchDraw()
+      } else if (this.arrowType === 'rect') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentRect = this.rects[this.rects.length - 1]
+        console.log(e.keyCode)
+        if (this.keyCode === 16) {
+          // 如果此时按下shift键
+          const width = pos.x - currentRect.x
+          const height = pos.y - currentRect.y
+          currentRect.width = currentRect.height = Math.min(width, height)
+        } else {
+          currentRect.width = pos.x - currentRect.x
+          currentRect.height = pos.y - currentRect.y
+        }
+      } else if (this.arrowType === 'circle') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentCircle = this.circles[this.circles.length - 1]
+        if (this.keyCode === 16) {
+          const radius = Math.min((pos.x - currentCircle.x), (pos.y - currentCircle.y))
+          const width = currentCircle.radiusX + radius
+          const height = currentCircle.radiusY + radius
+          currentCircle.radiusX = currentCircle.radiusY = Math.min(width, height)
+          currentCircle.x = currentCircle.x + radius
+          currentCircle.y = currentCircle.y + radius
+        } else {
+          currentCircle.radiusX = pos.x - currentCircle.x
+          currentCircle.radiusY = pos.y - currentCircle.y
+        }
+      } else if (this.arrowType === 'triangle') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentTriangle = this.triangles[this.triangles.length - 1]
+        const radius = Math.min((pos.x - currentTriangle.x), (pos.y - currentTriangle.y))
+        currentTriangle.radius = radius
+      } else if (this.arrowType === 'pentagon') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentPentagon = this.pentagons[this.pentagons.length - 1]
+        const radius = Math.min((pos.x - currentPentagon.x), (pos.y - currentPentagon.y))
+        currentPentagon.radius = radius
+      } else if (this.arrowType === 'hexagon') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentHexagon = this.hexagons[this.hexagons.length - 1]
+        const radius = Math.min((pos.x - currentHexagon.x), (pos.y - currentHexagon.y))
+        currentHexagon.radius = radius
+      } else if (this.arrowType === 'arc') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentArc = this.arcs[this.arcs.length - 1]
+        const outerRadius = Math.sqrt(Math.pow((pos.x - currentArc.x), 2) + Math.pow((pos.y - currentArc.y), 2))
+        const innerRadius = outerRadius / 2
+        const diff_x = pos.x - currentArc.x
+        const diff_y = pos.y - currentArc.y
+        const angle = Math.atan2(diff_y, diff_x) * 180 / Math.PI
+        console.log(innerRadius, angle)
+        currentArc.innerRadius = innerRadius
+        currentArc.outerRadius = outerRadius
+        currentArc.angle = angle
+      } else if (this.arrowType === 'line') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentLine = this.lines[this.lines.length - 1]
+        currentLine.points = [currentLine.points[0], currentLine.points[1], pos.x, pos.y]
+      } else if (this.arrowType === 'text') {
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        let currentText = this.texts[this.texts.length - 1]
+        currentText.fontSize = Math.max(pos.x - currentText.x, pos.y - currentText.y)
+      }
+
+    },
+    handleMouseUp () {
+      this.isDrawing = false
+      this.down = false
+      if (this.arrowType === 'arrow') {
+        if (!this.rectBox.visible) return
+        setTimeout(() => {
+          this.rectBox.visible = false
+          transformerNode.getLayer().batchDraw()
+        })
+        // const rectShapes = this.$refs.stage.getNode().find('Rect').toArray()
+        // const circleShapes = this.$refs.stage.getNode().find('Circle').toArray()
+        // const shapes = rectShapes.concat(circleShapes)
+        const shapes = this.$refs.stage.getNode().find(node => {
+          if (node.getClassName() === 'Ellipse' || node.id() === 'rect' || node.getClassName() === 'RegularPolygon' || node.getClassName() === 'Arc' || node.getClassName() === 'Line' || node.getClassName() === 'Text') return true
+        }).toArray() // 此处由于选择框四周有十个小矩形所以会影响判断，故而在生成矩形时需要添加标识，暂以id区分
+        const box = this.$refs.rectBox.getNode().getClientRect()
+        const selected = shapes.filter((shape) =>
+          Konva.Util.haveIntersection(box, shape.getClientRect())
+        )
+        transformerNode.nodes(selected)
+        transformerNode.getLayer().batchDraw()
+      }
+    },
+    // 监听点击事件，可以判断单击图形
+    handleClick (e) {
+      if (this.arrowType === 'arrow') { // 如果是普通箭头则具有选择图形能力
+        transformerNode = this.$refs.transformer.getNode()
+        // 点击画布本身，清空选择框
+        if (this.rectBox.visible) return
+        if (e.target === e.target.getStage()) {
+          this.selectedShapeName = ''
+          transformerNode.nodes([])
+          transformerNode.getLayer().draw()
+          return
+        }
+        if (e.target.id() === 'rect' || e.target.getClassName() === 'Ellipse' || e.target.getClassName() === 'RegularPolygon' || e.target.getClassName() === 'Arc' || e.target.getClassName() === 'Line' || e.target.getClassName() === 'Text') { // 此处后期需要添加需要识别的图形
+          const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey
+          const isSelected = transformerNode.nodes().indexOf(e.target) >= 0
+          if (!metaPressed && !isSelected) {
+            // if no key pressed and the node is not selected
+            // select just one
+            this.selectedShapeName = e.target.name()
+            transformerNode.nodes([e.target])
+          } else if (metaPressed && isSelected) { // 只在选中单个元素时提供右侧属性栏修改属性值
+            // if we pressed keys and node was selected
+            // we need to remove it from selection:
+            const nodes = transformerNode.nodes().slice() // use slice to have new copy of array
+            // remove node from array
+            nodes.splice(nodes.indexOf(e.target), 1)
+            if (nodes.length === 1) {
+              this.selectedShapeName = nodes[0].name()
+            } else {
+              this.selectedShapeName = ''
+            }
+            transformerNode.nodes(nodes)
+          } else if (metaPressed && !isSelected) { // 只在选中单个元素时提供右侧属性栏修改属性值
+            // add the node into selection
+            const nodes = transformerNode.nodes().concat([e.target])
+            if (nodes.length === 1) {
+              this.selectedShapeName = nodes[0].name()
+            } else {
+              this.selectedShapeName = ''
+            }
+            transformerNode.nodes(nodes)
+          }
+          transformerNode.getLayer().draw()
+        }
+      }
+    },
+    setShape (element) {
+      switch (this.arrowType) {
+        case 'rect':
+          this.rects = element
+          break
+        case 'circle':
+          this.circles = element
+          break
+        case 'triangle':
+          this.triangles = element
+          break
+        case 'pentagon':
+          this.pentagons = element
+          break
+        case 'hexagon':
+          this.hexagons = element
+          break
+        case 'arc':
+          this.arcs = element
+          break
+        case 'line':
+          this.lines = element
+          break
+        case 'text':
+          this.texts = element
+          break
+        default:
+          return
+      }
+    },
+    editText (e) {
+      e.target.hide()
+      if (!transformerNode) {
+        // 如果没有切换至普通箭头则需要创建选择框
+        transformerNode = this.$refs.transformer.getNode()
+      }
+      this.selectedShapeName = e.target.name()
+      transformerNode.nodes([e.target])
+      transformerNode.hide()
+      transformerNode.getLayer().draw()
+      const textPosition = e.target.absolutePosition()
+      const stageBox = this.$refs.stage.getNode().container().getBoundingClientRect()
+      const areaPosition = {
+        x: stageBox.left + textPosition.x,
+        y: stageBox.top + textPosition.y
+      }
+      const textArea = this.$refs.textArea
+      textArea.style.display = 'block'
+      textArea.value = e.target.text()
+      textArea.style.position = 'absolute'
+      textArea.style.top = areaPosition.y + 'px'
+      textArea.style.left = areaPosition.x + 'px'
+      textArea.style.width = e.target.width() - e.target.padding() * 2 + 'px'
+      textArea.style.height = e.target.height() - e.target.padding() * 2 + 5 + 'px'
+      textArea.style.fontSize = e.target.fontSize() + 'px'
+      textArea.style.border = 'none'
+      textArea.style.padding = '0px'
+      textArea.style.margin = '0px'
+      textArea.style.overflow = 'hidden'
+      textArea.style.background = 'none'
+      textArea.style.outline = 'none'
+      textArea.style.resize = 'none'
+      textArea.style.lineHeight = e.target.lineHeight()
+      textArea.style.fontFamily = e.target.fontFamily()
+      textArea.style.transformOrigin = 'left top'
+      textArea.style.textAlign = e.target.align()
+      textArea.style.color = e.target.fill()
+      const rotation = e.target.rotation()
+      let transform = ''
+      if (rotation) {
+        transform += 'rotateZ(' + rotation + 'deg)'
+      }
+      textArea.style.transform = transform
+      // reset height
+      textArea.style.height = 'auto'
+      // after browsers resized it we can set actual value
+      textArea.style.height = textArea.scrollHeight + 3 + 'px'
+      textArea.focus()
+    },
+    // 多行文本keydown
+    handleKeyDown (e) {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        const textNode = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
+        textNode.text(this.$refs.textArea.value)
+        this.$refs.textArea.style.display = 'none'
+        textNode.show()
+        transformerNode.show()
+        transformerNode.getLayer().draw()
+      }
+    },
+    // textarea失去焦点
+    handleBlur (e) {
+      console.log(e.target, 'in u')
+      const textNode = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
+      textNode.text(e.target.value)
+      e.target.style.display = 'none'
+      textNode.show()
+      transformerNode.show()
+      transformerNode.getLayer().draw()
+    }
+  },
+}
+</script>
+
+<style lang="less" scoped>
+.root {
+  height: 100%;
+}
+</style>
