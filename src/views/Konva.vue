@@ -1,10 +1,10 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-08 14:15:49
+ * @LastEditTime: 2021-01-08 16:33:13
  * @LastEditors: 月魂
  * @Description: 
- * @FilePath: \demo\src\views\Konva.vue
+ * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
 -->
 <template>
   <div class="root">
@@ -370,6 +370,7 @@
 
 <script>
 import Konva from 'konva'
+import { guid } from '../utils/utils'
 const kWidth = document.body.clientWidth * 0.84
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
@@ -487,7 +488,6 @@ export default {
       } else if (this.arrowType === 'rect') { // 如果是点击矩形按钮，则可以绘制矩形
         // this.isDrawing = true
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.now()
         this.setShape([
           ...this.rects,
           {
@@ -499,13 +499,12 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'rect-' + nowDate,
+            name: 'rect-' + guid(),
           },
         ])
       } else if (this.arrowType === 'circle') {
         // this.isDrawing = true
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.circles,
           {
@@ -517,12 +516,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'circle-' + nowDate,
+            name: 'circle-' + guid(),
           },
         ])
       } else if (this.arrowType === 'triangle') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.triangles,
           {
@@ -533,12 +531,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'triangle-' + nowDate,
+            name: 'triangle-' + guid(),
           },
         ])
       } else if (this.arrowType === 'pentagon') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.pentagons,
           {
@@ -549,12 +546,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'pentagon-' + nowDate,
+            name: 'pentagon-' + guid(),
           },
         ])
       } else if (this.arrowType === 'hexagon') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.hexagons,
           {
@@ -565,12 +561,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'hexagon-' + nowDate,
+            name: 'hexagon-' + guid(),
           },
         ])
       } else if (this.arrowType === 'arc') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.arcs,
           {
@@ -583,12 +578,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'arc-' + nowDate,
+            name: 'arc-' + guid(),
           },
         ])
       } else if (this.arrowType === 'line') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.lines,
           {
@@ -597,12 +591,11 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'line-' + nowDate,
+            name: 'line-' + guid(),
           },
         ])
       } else if (this.arrowType === 'text') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
-        const nowDate = Date.parse(new Date())
         this.setShape([
           ...this.texts,
           {
@@ -613,12 +606,12 @@ export default {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
-            name: 'text-' + nowDate,
+            name: 'text-' + guid(),
           },
         ])
       }
     },
-    handleMouseMove (e) {
+    handleMouseMove () {
       if (!this.isDrawing) return
       if (this.arrowType === 'arrow') {
         if (!this.rectBox.visible) return
@@ -635,7 +628,6 @@ export default {
       } else if (this.arrowType === 'rect') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentRect = this.rects[this.rects.length - 1]
-        console.log(e.keyCode)
         if (this.keyCode === 16) {
           // 如果此时按下shift键
           const width = pos.x - currentRect.x
@@ -682,7 +674,6 @@ export default {
         const diff_x = pos.x - currentArc.x
         const diff_y = pos.y - currentArc.y
         const angle = Math.atan2(diff_y, diff_x) * 180 / Math.PI
-        console.log(innerRadius, angle)
         currentArc.innerRadius = innerRadius
         currentArc.outerRadius = outerRadius
         currentArc.angle = angle
