@@ -17,3 +17,8 @@ yarn or npm install
 // 3. run
 yarn serve or npm run serve
 ```
+### todo
+1. 文字在普通箭头选中下无法修改
+2. 导出功能
+3. 铅笔工具，在按住shift情况下可以画出直线
+4. 箭头工具
