@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-08 16:33:13
+ * @LastEditTime: 2021-01-11 17:36:15
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -162,7 +162,7 @@
               <el-tooltip
                 class="item"
                 effect="dark"
-                content="直线"
+                content="铅笔"
                 placement="right"
               >
                 <svg
@@ -174,7 +174,7 @@
                   }"
                   @click="changeArrowType('line')"
                 >
-                  <use xlink:href="#icon-line"></use>
+                  <use xlink:href="#icon-pencil"></use>
                 </svg>
               </el-tooltip>
             </el-col>
@@ -370,7 +370,7 @@
 
 <script>
 import Konva from 'konva'
-import { guid } from '../utils/utils'
+import { delShape, drawByDown } from '../utils/utils'
 const kWidth = document.body.clientWidth * 0.84
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
@@ -395,7 +395,6 @@ export default {
       lines: [],
       texts: [],
       selectedShapeName: '', // 点击选中的图形名称
-      keyCode: 0, // 监听键盘按下值
       rectBox: { // 画布上矩形选择框
         visible: false,
         width: 0,
@@ -415,12 +414,48 @@ export default {
   },
   methods: {
     onKeyDown (e) {
-      //  此处keydown的场景影响到了textarea的正常输入
-      this.keyCode = e.keyCode
+      if (e.keyCode === 46) {
+        // 此处需同步删除data数组中的数据
+        const nodes = transformerNode.nodes()
+        nodes.map(item => {
+          const name = item.getAttr('name')
+          const shape = name.split('-')[0]
+          switch (shape) {
+            case 'rect':
+              this.rects = delShape(name, this.rects)
+              break
+            case 'circle':
+              this.circles = delShape(name, this.circles)
+              break
+            case 'triangle':
+              this.triangles = delShape(name, this.triangles)
+              break
+            case 'pentagon':
+              this.pentagons = delShape(name, this.pentagons)
+              break
+            case 'hexagon':
+              this.hexagons = delShape(name, this.hexagons)
+              break
+            case 'arc':
+              this.arcs = delShape(name, this.arcs)
+              break
+            case 'line':
+              this.lines = delShape(name, this.lines)
+              break
+            case 'text':
+              this.texts = delShape(name, this.texts)
+              break
+            default:
+              return
+          }
+          item.destroy()
+        })
+        transformerNode.nodes([])
+        transformerNode.getLayer().draw()
+      }
     },
     onKeyUp (e) {
       e.preventDefault()
-      this.keyCode = 0
     },
     changeArrowType (type) { // 切换操作类型，可以是普通箭头，可以是形状生成工具
       this.arrowType = type
@@ -485,133 +520,38 @@ export default {
         //   this.selectedShapeName = ''
         // }
         // this.updateTransformer()
-      } else if (this.arrowType === 'rect') { // 如果是点击矩形按钮，则可以绘制矩形
-        // this.isDrawing = true
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.rects,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            width: 0,
-            height: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'rect-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'circle') {
-        // this.isDrawing = true
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.circles,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            radiusX: 0,
-            radiusY: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'circle-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'triangle') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.triangles,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            radius: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'triangle-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'pentagon') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.pentagons,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            radius: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'pentagon-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'hexagon') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.hexagons,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            radius: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'hexagon-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'arc') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.arcs,
-          {
-            x: Number(pos.x),
-            y: Number(pos.y),
-            innerRadius: 0,
-            outerRadius: 0,
-            draggable: true,
-            angle: 0,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'arc-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'line') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.lines,
-          {
-            points: [Number(pos.x), Number(pos.y),],
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'line-' + guid(),
-          },
-        ])
-      } else if (this.arrowType === 'text') {
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        this.setShape([
-          ...this.texts,
-          {
-            x: pos.x,
-            y: pos.y,
-            fontSize: 0,
-            draggable: true,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-            name: 'text-' + guid(),
-          },
-        ])
+      }
+      const pos = this.$refs.stage.getNode().getPointerPosition()
+      switch (this.arrowType) {
+        case 'rect':
+          this.rects = drawByDown(pos, this.rects, 'rect')
+          break
+        case 'circle':
+          this.circles = drawByDown(pos, this.circles, 'circle')
+          break
+        case 'triangle':
+          this.triangles = drawByDown(pos, this.triangles, 'triangle')
+          break
+        case 'pentagon':
+          this.pentagons = drawByDown(pos, this.pentagons, 'pentagon')
+          break
+        case 'hexagon':
+          this.hexagons = drawByDown(pos, this.hexagons, 'hexagon')
+          break
+        case 'arc':
+          this.arcs = drawByDown(pos, this.arcs, 'arc')
+          break
+        case 'line':
+          this.lines = drawByDown(pos, this.lines, 'line')
+          break
+        case 'text':
+          this.texts = drawByDown(pos, this.texts, 'text')
+          break
+        default:
+          return
       }
     },
-    handleMouseMove () {
+    handleMouseMove (e) {
       if (!this.isDrawing) return
       if (this.arrowType === 'arrow') {
         if (!this.rectBox.visible) return
@@ -628,7 +568,7 @@ export default {
       } else if (this.arrowType === 'rect') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentRect = this.rects[this.rects.length - 1]
-        if (this.keyCode === 16) {
+        if (e.evt.shiftKey) {
           // 如果此时按下shift键
           const width = pos.x - currentRect.x
           const height = pos.y - currentRect.y
@@ -640,7 +580,7 @@ export default {
       } else if (this.arrowType === 'circle') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentCircle = this.circles[this.circles.length - 1]
-        if (this.keyCode === 16) {
+        if (e.evt.shiftKey) {
           const radius = Math.min((pos.x - currentCircle.x), (pos.y - currentCircle.y))
           const width = currentCircle.radiusX + radius
           const height = currentCircle.radiusY + radius
@@ -680,7 +620,12 @@ export default {
       } else if (this.arrowType === 'line') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentLine = this.lines[this.lines.length - 1]
-        currentLine.points = [currentLine.points[0], currentLine.points[1], pos.x, pos.y]
+        if (e.evt.shiftKey) {
+          currentLine.points = [currentLine.points[0], currentLine.points[1], pos.x, pos.y]
+        } else {
+          const newPoints = currentLine.points.concat([pos.x, pos.y])
+          currentLine.points = newPoints
+        }
       } else if (this.arrowType === 'text') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentText = this.texts[this.texts.length - 1]
