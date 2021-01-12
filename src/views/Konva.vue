@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-11 17:36:15
+ * @LastEditTime: 2021-01-12 16:42:04
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -16,7 +16,7 @@
     ></textarea>
     <el-container>
       <el-container>
-        <el-aside width="8%">
+        <el-aside width="4%" class="leftPart">
           <el-row>
             <el-col :span="24">
               <el-tooltip
@@ -362,7 +362,161 @@
             </v-layer>
           </v-stage>
         </el-main>
-        <el-aside width="8%">右侧属性栏</el-aside>
+        <el-aside width="16%" class="rightPart">
+          <h3>属性栏</h3>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'rect'">
+            <el-col :span="6">
+              <span class="attr">宽度</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.width"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'width')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'rect'">
+            <el-col :span="6">
+              <span class="attr">高度</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.height"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'height')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row
+            v-show="
+              selectedShapeName.split('-')[0] === 'triangle' ||
+              selectedShapeName.split('-')[0] === 'pentagon' ||
+              selectedShapeName.split('-')[0] === 'hexagon'
+            "
+          >
+            <el-col :span="6">
+              <span class="attr">半径</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.radius"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'radius')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+            <el-col :span="6">
+              <span class="attr">内半径</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.innerRadius"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'innerRadius')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+            <el-col :span="6">
+              <span class="attr">外半径</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.outerRadius"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'outerRadius')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+            <el-col :span="6">
+              <span class="attr">角度</span>
+            </el-col>
+            <el-col :span="17"
+              ><el-slider
+                :min="-180"
+                :max="180"
+                v-model="attr.angle"
+                @change="(value) => handleChange(value, 'angle')"
+              ></el-slider
+            ></el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'circle'">
+            <el-col :span="6">
+              <span class="attr">X半径</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.radiusX"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'radiusX')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'circle'">
+            <el-col :span="6">
+              <span class="attr">Y半径</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.radiusY"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'radiusY')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] === 'text'">
+            <el-col :span="6">
+              <span class="attr">字号</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.fontSize"
+                :min="12"
+                :precision="0"
+                @change="(value) => handleChange(value, 'fontSize')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="6">
+              <span class="attr">旋转</span>
+            </el-col>
+            <el-col :span="17">
+              <el-slider
+                :disabled="selectedShapeName === ''"
+                :min="-180"
+                :max="180"
+                v-model="attr.rotate"
+                @change="(value) => handleChange(value, 'rotation')"
+              ></el-slider>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="6">
+              <span class="attr">拖拽</span>
+            </el-col>
+            <el-col :span="17">
+              <el-switch
+                :disabled="selectedShapeName === ''"
+                style="height: 36px; float: left"
+                v-model="attr.draggable"
+                active-text="开"
+                inactive-text="关"
+                @change="(value) => handleChange(value, 'draggable')"
+              ></el-switch>
+            </el-col>
+          </el-row>
+        </el-aside>
       </el-container>
     </el-container>
   </div>
@@ -370,8 +524,8 @@
 
 <script>
 import Konva from 'konva'
-import { delShape, drawByDown } from '../utils/utils'
-const kWidth = document.body.clientWidth * 0.84
+import { delShape, drawByDown, setAttr } from '../utils/utils'
+const kWidth = document.body.clientWidth * 0.8
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
 let transformerNode = ''
@@ -379,6 +533,19 @@ export default {
   name: 'konva',
   data () {
     return {
+      attr: {
+        width: 0,
+        height: 0,
+        radius: 0,
+        radiusX: 0,
+        radiusY: 0,
+        innerRadius: 0,
+        outerRadius: 0,
+        angle: 0,
+        rotate: 0,
+        fontSize: 12,
+        draggable: true,
+      },
       isDrawing: false, // 判断是否绘制的字段
       arrowType: 'arrow', // 判断要绘制的图形
       down: false, // 检测鼠标是否按下
@@ -652,6 +819,14 @@ export default {
         const selected = shapes.filter((shape) =>
           Konva.Util.haveIntersection(box, shape.getClientRect())
         )
+        if (selected.length === 1) {
+          this.selectedShapeName = selected[0].name() // 将选中的单个值name修改后需将右侧attr同步修改
+          const attrs = selected[0].getAttrs()
+          const type = selected[0].name().split('-')[0]
+          this.attr = setAttr(type, attrs, this.attr)
+        } else {
+          this.selectedShapeName = ''
+        }
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
       }
@@ -675,6 +850,9 @@ export default {
             // if no key pressed and the node is not selected
             // select just one
             this.selectedShapeName = e.target.name()
+            const attrs = e.target.getAttrs()
+            const type = e.target.name().split('-')[0]
+            this.attr = setAttr(type, attrs, this.attr)
             transformerNode.nodes([e.target])
           } else if (metaPressed && isSelected) { // 只在选中单个元素时提供右侧属性栏修改属性值
             // if we pressed keys and node was selected
@@ -684,6 +862,9 @@ export default {
             nodes.splice(nodes.indexOf(e.target), 1)
             if (nodes.length === 1) {
               this.selectedShapeName = nodes[0].name()
+              const attrs = nodes[0].getAttrs()
+              const type = nodes[0].name().split('-')[0]
+              this.attr = setAttr(type, attrs, this.attr)
             } else {
               this.selectedShapeName = ''
             }
@@ -693,6 +874,9 @@ export default {
             const nodes = transformerNode.nodes().concat([e.target])
             if (nodes.length === 1) {
               this.selectedShapeName = nodes[0].name()
+              const attrs = nodes[0].getAttrs()
+              const type = nodes[0].name().split('-')[0]
+              this.attr = setAttr(type, attrs, this.attr)
             } else {
               this.selectedShapeName = ''
             }
@@ -700,36 +884,6 @@ export default {
           }
           transformerNode.getLayer().draw()
         }
-      }
-    },
-    setShape (element) {
-      switch (this.arrowType) {
-        case 'rect':
-          this.rects = element
-          break
-        case 'circle':
-          this.circles = element
-          break
-        case 'triangle':
-          this.triangles = element
-          break
-        case 'pentagon':
-          this.pentagons = element
-          break
-        case 'hexagon':
-          this.hexagons = element
-          break
-        case 'arc':
-          this.arcs = element
-          break
-        case 'line':
-          this.lines = element
-          break
-        case 'text':
-          this.texts = element
-          break
-        default:
-          return
       }
     },
     editText (e) {
@@ -794,14 +948,18 @@ export default {
     },
     // textarea失去焦点
     handleBlur (e) {
-      console.log(e.target, 'in u')
       const textNode = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
       textNode.text(e.target.value)
       e.target.style.display = 'none'
       textNode.show()
       transformerNode.show()
       transformerNode.getLayer().draw()
-    }
+    },
+    handleChange (value, name) { // 右侧属性值变更映射到图形上
+      const node = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
+      node.setAttr(name, value)
+      transformerNode.getLayer().batchDraw()
+    },
   },
 }
 </script>
@@ -809,5 +967,14 @@ export default {
 <style lang="less" scoped>
 .root {
   height: 100%;
+  .leftPart {
+    line-height: 56px;
+  }
+  .rightPart {
+    padding-right: 8px;
+    .attr {
+      line-height: 40px;
+    }
+  }
 }
 </style>

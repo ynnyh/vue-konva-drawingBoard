@@ -58,3 +58,40 @@ export function drawByDown (pos, data, type) {
     params,
   ]
 }
+
+// 根据传入的图形类型和attr修改
+export function setAttr (type, params, data) { // 图形类型，图形自身参数，data里attr参数
+  let obj = {
+    draggable: params.draggable,
+    rotate: Math.ceil(params.rotation) || 0
+  }
+  switch (type) {
+    case 'rect':
+      obj.width = params.width
+      obj.height = params.height
+      break
+    case 'circle':
+      obj.radiusX = params.radiusX
+      obj.radiusY = params.radiusY
+      break
+    case 'triangle': case 'pentagon': case 'hexagon':
+      obj.radius = params.radius
+      break
+    case 'arc':
+      obj.innerRadius = params.innerRadius
+      obj.outerRadius = params.outerRadius
+      obj.angle = Math.ceil(params.angle)
+      break
+    case 'text':
+      obj.fontSize = params.fontSize
+      break
+    case 'line':
+      break
+    default:
+      return
+  }
+  return {
+    ...data,
+    ...obj
+  }
+}

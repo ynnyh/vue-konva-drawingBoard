@@ -1,10 +1,10 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-24 10:51:41
- * @LastEditTime: 2020-12-31 15:11:58
+ * @LastEditTime: 2021-01-12 10:45:09
  * @LastEditors: 月魂
  * @Description: In User Settings Edit
- * @FilePath: \demo\src\App.vue
+ * @FilePath: \vue-konva-drawingBoard\src\App.vue
 -->
 <template>
   <div id="app">
@@ -29,7 +29,6 @@ body {
   background-color: #d3dce6;
   color: #333;
   text-align: center;
-  line-height: 64px;
   padding-top: 36px;
 }
 
