@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-12 16:42:04
+ * @LastEditTime: 2021-01-14 15:08:23
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -524,7 +524,7 @@
 
 <script>
 import Konva from 'konva'
-import { delShape, drawByDown, setAttr } from '../utils/utils'
+import { delShape, drawByDown, setAttr, getCenter } from '../utils/utils'
 const kWidth = document.body.clientWidth * 0.8
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
@@ -823,6 +823,7 @@ export default {
           this.selectedShapeName = selected[0].name() // 将选中的单个值name修改后需将右侧attr同步修改
           const attrs = selected[0].getAttrs()
           const type = selected[0].name().split('-')[0]
+          console.log(attrs, 'attrs')
           this.attr = setAttr(type, attrs, this.attr)
         } else {
           this.selectedShapeName = ''
@@ -892,7 +893,10 @@ export default {
         // 如果没有切换至普通箭头则需要创建选择框
         transformerNode = this.$refs.transformer.getNode()
       }
-      this.selectedShapeName = e.target.name()
+      this.selectedShapeName = e.target.name() // 将选中的单个值name修改后需将右侧attr同步修改
+      const attrs = e.target.getAttrs()
+      const type = e.target.name().split('-')[0]
+      this.attr = setAttr(type, attrs, this.attr)
       transformerNode.nodes([e.target])
       transformerNode.hide()
       transformerNode.getLayer().draw()
@@ -957,6 +961,22 @@ export default {
     },
     handleChange (value, name) { // 右侧属性值变更映射到图形上
       const node = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
+      const selectedShape = this.selectedShapeName.split('-')[0]
+      if (selectedShape === 'rect' || selectedShape === 'text') {
+        console.log('in rect text')
+        const shape = {
+          x: node.x(),
+          y: node.y(),
+          width: node.width(),
+          height: node.height(),
+          rotation: node.rotation(),
+          deg: value
+        }
+        const newAttr = getCenter(shape)
+        console.log(newAttr)
+        node.setAttr('x', newAttr.x)
+        node.setAttr('y', newAttr.y)
+      }
       node.setAttr(name, value)
       transformerNode.getLayer().batchDraw()
     },
