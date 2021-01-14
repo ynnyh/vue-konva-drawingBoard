@@ -117,7 +117,7 @@ export function getCenter (shape) { // 需要参数为x, y, width, height, rotat
   shape.x -= centerPoint.x
   shape.y -= centerPoint.y
 
-  console.log(centerPoint, 'center', shape.rotation)
+  console.log(centerPoint, 'center', shape.rotation * Math.PI / 180)
 
   // const origin = {
   //   x: centerPoint.x - shape.width / 2,
@@ -130,9 +130,13 @@ export function getCenter (shape) { // 需要参数为x, y, width, height, rotat
   // }
 
   // 求出的第一步是正确的，前提条件必须是旋转角度为0
+  const hypo = Math.sqrt(Math.pow((shape.width / 2), 2) + Math.pow((shape.height / 2), 2))
+  const h = hypo * Math.sin(shape.deg * Math.PI / 180)
+  const w = hypo * Math.cos(shape.deg * Math.PI / 180)
+  console.log(hypo, h, w)
   return {
-    x: shape.x * Math.cos(shape.deg * Math.PI / 180) + shape.y * Math.sin(-shape.deg * Math.PI / 180) + centerPoint.x,
-    y: shape.x * Math.sin(shape.deg * Math.PI / 180) + shape.y * Math.cos(shape.deg * Math.PI / 180) + centerPoint.y,
+    x: shape.x * Math.cos(shape.deg * Math.PI / 180) + shape.y * Math.sin(-shape.deg * Math.PI / 180) + w + centerPoint.x,
+    y: shape.x * Math.sin(shape.deg * Math.PI / 180) + shape.y * Math.cos(shape.deg * Math.PI / 180) + h + centerPoint.y,
   }
 
 
