@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-14 15:08:23
+ * @LastEditTime: 2021-01-15 15:59:07
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -322,7 +322,7 @@
                   points: line.points,
                   name: line.name,
                   stroke: 'red',
-                  strokeWidth: 15,
+                  strokeWidth: 1,
                   lineCap: 'round',
                   lineJoin: 'round',
                   scaleX: line.scaleX,
@@ -962,23 +962,25 @@ export default {
     handleChange (value, name) { // 右侧属性值变更映射到图形上
       const node = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
       const selectedShape = this.selectedShapeName.split('-')[0]
+      const shape = {
+        oldX: node.x(),
+        oldY: node.y(),
+        width: node.width(),
+        height: node.height(),
+        rotation: node.rotation(),
+        deg: value
+      }
+      node.setAttr(name, value)
       if (selectedShape === 'rect' || selectedShape === 'text') {
-        console.log('in rect text')
-        const shape = {
-          x: node.x(),
-          y: node.y(),
-          width: node.width(),
-          height: node.height(),
-          rotation: node.rotation(),
-          deg: value
-        }
+        shape.x = node.x()
+        shape.y = node.y()
+        shape.deg = node.rotation()
         const newAttr = getCenter(shape)
         console.log(newAttr)
         node.setAttr('x', newAttr.x)
         node.setAttr('y', newAttr.y)
       }
-      node.setAttr(name, value)
-      transformerNode.getLayer().batchDraw()
+      // transformerNode.getLayer().batchDraw()
     },
   },
 }

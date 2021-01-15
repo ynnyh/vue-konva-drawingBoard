@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2021-01-08 14:20:20
- * @LastEditTime: 2021-01-13 15:39:29
+ * @LastEditTime: 2021-01-15 10:42:40
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\README.md
@@ -49,5 +49,6 @@ yarn serve or npm run serve
 2. 文字和线条设置旋转角度时与直接旋转图形表现不一致
 3. 文字双击修改后，移动后原来位置可以被鼠标拖拽框选 (修复)
 4. 文字双击选中后，右侧属性栏并没有正确读取到属性值 (修复)
+5. 图形选中时如果先旋转图形再操作右侧属性栏会发生问题
 
 

@@ -98,8 +98,8 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
 
 // 图形旋转时解决rect、line和text的旋转中心问题
 export function getCenter (shape) { // 需要参数为x, y, width, height, rotation
-  shape.rotation = shape.rotation >= 0 ? shape.rotation : 360 + shape.rotation
-  shape.deg = shape.deg >= 0 ? shape.deg : 360 + shape.deg
+  // shape.rotation = shape.rotation >= 0 ? shape.rotation : 360 + shape.rotation
+  // shape.deg = shape.deg >= 0 ? shape.deg : 360 + shape.deg
   console.log(shape)
   // 由于每次旋转时该图形的(x, y)坐标会发生改变，故而需要寻找一个固定点去推导原始坐标点从而进行旋转
   // 对于图形元素而言，中心点为((x + width) / 2, (y + height) / 2)，与旋转矩阵公式进行推导即可
@@ -110,14 +110,16 @@ export function getCenter (shape) { // 需要参数为x, y, width, height, rotat
 
 
   const centerPoint = { // 求出中心点，中心点位置是不变的
-    x: shape.x + (shape.width / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.height / 2) * Math.sin(-shape.rotation * Math.PI / 180),
-    y: shape.y + (shape.height / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.width / 2) * Math.sin(shape.rotation * Math.PI / 180)
+    x: shape.oldX + (shape.width / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.height / 2) * Math.sin(-shape.rotation * Math.PI / 180),
+    y: shape.oldY + (shape.height / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.width / 2) * Math.sin(shape.rotation * Math.PI / 180)
   }
-  // 将中心旋转点平移到原点
-  shape.x -= centerPoint.x
-  shape.y -= centerPoint.y
 
-  console.log(centerPoint, 'center', shape.rotation * Math.PI / 180)
+  const nowCenterPoint = { // 求出中心点，中心点位置是不变的
+    x: shape.x + (shape.width / 2) * Math.cos(shape.deg * Math.PI / 180) + (shape.deg / 2) * Math.sin(-shape.deg * Math.PI / 180),
+    y: shape.y + (shape.height / 2) * Math.cos(shape.deg * Math.PI / 180) + (shape.deg / 2) * Math.sin(shape.deg * Math.PI / 180)
+  }
+
+  console.log(centerPoint, nowCenterPoint, 'center')
 
   // const origin = {
   //   x: centerPoint.x - shape.width / 2,
@@ -129,19 +131,9 @@ export function getCenter (shape) { // 需要参数为x, y, width, height, rotat
   //   y: origin.x * Math.sin(shape.deg) + origin.y * Math.cos(shape.deg) + 0,
   // }
 
-  // 求出的第一步是正确的，前提条件必须是旋转角度为0
-  const hypo = Math.sqrt(Math.pow((shape.width / 2), 2) + Math.pow((shape.height / 2), 2))
-  const h = hypo * Math.sin(shape.deg * Math.PI / 180)
-  const w = hypo * Math.cos(shape.deg * Math.PI / 180)
-  console.log(hypo, h, w)
   return {
-    x: shape.x * Math.cos(shape.deg * Math.PI / 180) + shape.y * Math.sin(-shape.deg * Math.PI / 180) + w + centerPoint.x,
-    y: shape.x * Math.sin(shape.deg * Math.PI / 180) + shape.y * Math.cos(shape.deg * Math.PI / 180) + h + centerPoint.y,
+    x: shape.x + centerPoint.x - nowCenterPoint.x,
+    y: shape.y + centerPoint.y - nowCenterPoint.y
   }
 
-
-  // return { // 官方实例的这个求出的点是中心点
-  //   x: shape.x + (shape.width / 2) * Math.cos(deg) + (shape.height / 2) * Math.sin(-deg),
-  //   y: shape.y + (shape.height / 2) * Math.cos(deg) + (shape.width / 2) * Math.sin(deg)
-  // }
 }
