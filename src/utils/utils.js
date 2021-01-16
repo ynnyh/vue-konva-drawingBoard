@@ -63,12 +63,16 @@ export function drawByDown (pos, data, type) {
 export function setAttr (type, params, data) { // 图形类型，图形自身参数，data里attr参数
   let obj = {
     draggable: params.draggable,
-    rotate: Math.ceil(params.rotation) || 0
+    rotate: Math.ceil(params.rotation) || 0,
   }
   switch (type) {
     case 'rect':
       obj.width = params.width
       obj.height = params.height
+      obj.offset = {
+        x: 0,
+        y: 0,
+      }
       break
     case 'circle':
       obj.radiusX = params.radiusX
@@ -84,6 +88,10 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
       break
     case 'text':
       obj.fontSize = params.fontSize
+      obj.offset = {
+        x: 0,
+        y: 0,
+      }
       break
     case 'line':
       break
@@ -94,46 +102,4 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
     ...data,
     ...obj
   }
-}
-
-// 图形旋转时解决rect、line和text的旋转中心问题
-export function getCenter (shape) { // 需要参数为x, y, width, height, rotation
-  // shape.rotation = shape.rotation >= 0 ? shape.rotation : 360 + shape.rotation
-  // shape.deg = shape.deg >= 0 ? shape.deg : 360 + shape.deg
-  console.log(shape)
-  // 由于每次旋转时该图形的(x, y)坐标会发生改变，故而需要寻找一个固定点去推导原始坐标点从而进行旋转
-  // 对于图形元素而言，中心点为((x + width) / 2, (y + height) / 2)，与旋转矩阵公式进行推导即可
-  // 旋转矩阵公式 x = x * cos rotate - y * sin rotate; y = x * cos rotate + y * sin rotate
-
-  // const newX = (shape.x + shape.width) / 2
-  // const newY = (shape.y + shape.height) / 2
-
-
-  const centerPoint = { // 求出中心点，中心点位置是不变的
-    x: shape.oldX + (shape.width / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.height / 2) * Math.sin(-shape.rotation * Math.PI / 180),
-    y: shape.oldY + (shape.height / 2) * Math.cos(shape.rotation * Math.PI / 180) + (shape.width / 2) * Math.sin(shape.rotation * Math.PI / 180)
-  }
-
-  const nowCenterPoint = { // 求出中心点，中心点位置是不变的
-    x: shape.x + (shape.width / 2) * Math.cos(shape.deg * Math.PI / 180) + (shape.deg / 2) * Math.sin(-shape.deg * Math.PI / 180),
-    y: shape.y + (shape.height / 2) * Math.cos(shape.deg * Math.PI / 180) + (shape.deg / 2) * Math.sin(shape.deg * Math.PI / 180)
-  }
-
-  console.log(centerPoint, nowCenterPoint, 'center')
-
-  // const origin = {
-  //   x: centerPoint.x - shape.width / 2,
-  //   y: centerPoint.y - shape.height / 2,
-  // }
-
-  // return {
-  //   x: origin.x * Math.cos(shape.deg) - origin.y * Math.sin(shape.deg) + 0, // 不考虑偏移量
-  //   y: origin.x * Math.sin(shape.deg) + origin.y * Math.cos(shape.deg) + 0,
-  // }
-
-  return {
-    x: shape.x + centerPoint.x - nowCenterPoint.x,
-    y: shape.y + centerPoint.y - nowCenterPoint.y
-  }
-
 }

@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2021-01-08 14:20:20
- * @LastEditTime: 2021-01-15 10:42:40
+ * @LastEditTime: 2021-01-16 11:20:37
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\README.md
@@ -42,6 +42,10 @@ yarn serve or npm run serve
 1. 设置旋转角度时，四边形，线条及文字旋转是按照左上角为圆心进行旋转，与预期表现不符，需要进行调整
 2. 给line设置旋转角度时由于line的坐标为一组points所以需要计算points中的每一个坐标
 3. line应该可以设置圆角及线条样式，比如虚线等
+
+### 矩形，线条和文字旋转
+旋转问题通过设置offset得到解决，但是带来的问题是生成时视觉效果上给人感觉不满意
+不是拖拽至生成位置，而是以鼠标点击位置为圆心进行生成，感觉很差，需要想办法改进
 
 
 ### bug

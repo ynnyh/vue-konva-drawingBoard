@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-15 15:59:07
+ * @LastEditTime: 2021-01-16 16:57:42
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -216,6 +216,7 @@
                 :config="{
                   x: Math.min(rect.x, rect.x + rect.width),
                   y: Math.min(rect.y, rect.y + rect.height),
+                  offset: rect.offset,
                   width: Math.abs(rect.width),
                   height: Math.abs(rect.height),
                   fillEnable: false,
@@ -320,6 +321,7 @@
                 :key="line.name"
                 :config="{
                   points: line.points,
+                  offset: line.offset,
                   name: line.name,
                   stroke: 'red',
                   strokeWidth: 1,
@@ -337,6 +339,7 @@
                 :config="{
                   x: text.x,
                   y: text.y,
+                  offset: text.offset,
                   text: 'hello world',
                   fontSize: Math.abs(text.fontSize),
                   fontFamily: 'Calibri',
@@ -487,7 +490,7 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
             <el-col :span="6">
               <span class="attr">旋转</span>
             </el-col>
@@ -524,7 +527,7 @@
 
 <script>
 import Konva from 'konva'
-import { delShape, drawByDown, setAttr, getCenter } from '../utils/utils'
+import { delShape, drawByDown, setAttr } from '../utils/utils'
 const kWidth = document.body.clientWidth * 0.8
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
@@ -744,6 +747,10 @@ export default {
           currentRect.width = pos.x - currentRect.x
           currentRect.height = pos.y - currentRect.y
         }
+        currentRect.offset = {
+          x: currentRect.width / 2,
+          y: currentRect.height / 2
+        }
       } else if (this.arrowType === 'circle') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentCircle = this.circles[this.circles.length - 1]
@@ -797,12 +804,18 @@ export default {
         const pos = this.$refs.stage.getNode().getPointerPosition()
         let currentText = this.texts[this.texts.length - 1]
         currentText.fontSize = Math.max(pos.x - currentText.x, pos.y - currentText.y)
+        const node = this.$refs.stage.getNode().findOne('.' + currentText.name)
+        currentText.offset = {
+          x: node.width() / 2,
+          y: node.height() / 2
+        }
       }
 
     },
     handleMouseUp () {
       this.isDrawing = false
       this.down = false
+      // 在抬起鼠标的时候需要对矩形，线条和文字进行offset计算，设置旋转中心点
       if (this.arrowType === 'arrow') {
         if (!this.rectBox.visible) return
         setTimeout(() => {
@@ -962,25 +975,11 @@ export default {
     handleChange (value, name) { // 右侧属性值变更映射到图形上
       const node = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
       const selectedShape = this.selectedShapeName.split('-')[0]
-      const shape = {
-        oldX: node.x(),
-        oldY: node.y(),
-        width: node.width(),
-        height: node.height(),
-        rotation: node.rotation(),
-        deg: value
+      if (selectedShape === 'rect' && name === 'rotation') {
+        node.rotate(value)
       }
       node.setAttr(name, value)
-      if (selectedShape === 'rect' || selectedShape === 'text') {
-        shape.x = node.x()
-        shape.y = node.y()
-        shape.deg = node.rotation()
-        const newAttr = getCenter(shape)
-        console.log(newAttr)
-        node.setAttr('x', newAttr.x)
-        node.setAttr('y', newAttr.y)
-      }
-      // transformerNode.getLayer().batchDraw()
+      transformerNode.getLayer().batchDraw()
     },
   },
 }
