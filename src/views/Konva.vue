@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-16 16:57:42
+ * @LastEditTime: 2021-01-18 11:34:37
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -220,6 +220,7 @@
                   width: Math.abs(rect.width),
                   height: Math.abs(rect.height),
                   fillEnable: false,
+                  strokeEnabled: true,
                   stroke: '#000',
                   strokeWidth: 1,
                   name: rect.name,
@@ -238,6 +239,7 @@
                   y: cir.y,
                   radiusX: Math.abs(cir.radiusX),
                   radiusY: Math.abs(cir.radiusY),
+                  strokeEnabled: true,
                   stroke: '#000',
                   strokeWidth: 1,
                   name: cir.name,
@@ -255,13 +257,14 @@
                   y: triangle.y,
                   sides: 3,
                   radius: Math.abs(triangle.radius),
+                  strokeEnabled: true,
                   strokeWidth: 1,
+                  stroke: '#000',
                   name: triangle.name,
                   scaleX: triangle.scaleX,
                   scaleY: triangle.scaleY,
                   draggable: triangle.draggable,
                   fillEnable: false,
-                  stroke: 'black',
                 }"
               ></v-regular-polygon>
               <v-regular-polygon
@@ -272,13 +275,14 @@
                   y: pentagon.y,
                   sides: 5,
                   radius: Math.abs(pentagon.radius),
+                  strokeEnabled: true,
                   strokeWidth: 1,
+                  stroke: '#000',
                   name: pentagon.name,
                   scaleX: pentagon.scaleX,
                   scaleY: pentagon.scaleY,
                   draggable: pentagon.draggable,
                   fillEnable: false,
-                  stroke: 'black',
                 }"
               ></v-regular-polygon>
               <v-regular-polygon
@@ -289,13 +293,14 @@
                   y: hexagon.y,
                   sides: 6,
                   radius: Math.abs(hexagon.radius),
+                  strokeEnabled: true,
                   strokeWidth: 1,
+                  stroke: '#000',
                   name: hexagon.name,
                   scaleX: hexagon.scaleX,
                   scaleY: hexagon.scaleY,
                   draggable: hexagon.draggable,
                   fillEnable: false,
-                  stroke: 'black',
                 }"
               ></v-regular-polygon>
               <v-arc
@@ -308,11 +313,12 @@
                   outerRadius: Math.abs(arc.outerRadius),
                   angle: arc.angle,
                   name: arc.name,
-                  stroke: 'black',
                   scaleX: arc.scaleX,
                   scaleY: arc.scaleY,
                   draggable: arc.draggable,
+                  strokeEnabled: true,
                   strokeWidth: 1,
+                  stroke: '#000',
                   fillEnable: false,
                 }"
               ></v-arc>
@@ -323,8 +329,9 @@
                   points: line.points,
                   offset: line.offset,
                   name: line.name,
-                  stroke: 'red',
+                  strokeEnabled: true,
                   strokeWidth: 1,
+                  stroke: '#000',
                   lineCap: 'round',
                   lineJoin: 'round',
                   scaleX: line.scaleX,
@@ -344,7 +351,10 @@
                   fontSize: Math.abs(text.fontSize),
                   fontFamily: 'Calibri',
                   name: text.name,
-                  fill: '#555',
+                  strokeEnabled: true,
+                  stroke: '#000',
+                  strokeWidth: 1,
+                  fillEnabled: true,
                   scaleX: text.scaleX,
                   scaleY: text.scaleY,
                   draggable: text.draggable,
@@ -490,6 +500,71 @@
               ></el-input-number>
             </el-col>
           </el-row>
+          <el-row>
+            <el-col :span="6">
+              <span class="attr">描边</span>
+            </el-col>
+            <el-col :span="17">
+              <el-switch
+                :disabled="selectedShapeName === ''"
+                style="height: 36px; float: left"
+                v-model="attr.strokeEnabled"
+                active-text="开"
+                inactive-text="关"
+                @change="(value) => handleChange(value, 'strokeEnabled')"
+              ></el-switch>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="6">
+              <span class="attr">描边宽度</span>
+            </el-col>
+            <el-col :span="17">
+              <el-input-number
+                v-model="attr.strokeWidth"
+                :min="0"
+                :precision="0"
+                @change="(value) => handleChange(value, 'strokeWidth')"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="6">
+              <span class="attr">描边颜色</span>
+            </el-col>
+            <el-col :span="6">
+              <el-color-picker
+                v-model="attr.stroke"
+                @change="(value) => handleChange(value, 'stroke')"
+              ></el-color-picker>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
+            <el-col :span="6">
+              <span class="attr">填充</span>
+            </el-col>
+            <el-col :span="17">
+              <el-switch
+                :disabled="selectedShapeName === ''"
+                style="height: 36px; float: left"
+                v-model="attr.fillEnabled"
+                active-text="开"
+                inactive-text="关"
+                @change="(value) => handleChange(value, 'fillEnabled')"
+              ></el-switch>
+            </el-col>
+          </el-row>
+          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
+            <el-col :span="6">
+              <span class="attr">填充颜色</span>
+            </el-col>
+            <el-col :span="6">
+              <el-color-picker
+                v-model="attr.fill"
+                @change="(value) => handleChange(value, 'fill')"
+              ></el-color-picker>
+            </el-col>
+          </el-row>
           <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
             <el-col :span="6">
               <span class="attr">旋转</span>
@@ -548,6 +623,11 @@ export default {
         rotate: 0,
         fontSize: 12,
         draggable: true,
+        strokeEnabled: true,
+        strokeWidth: 0,
+        stroke: '',
+        fillEnabled: true,
+        fill: '',
       },
       isDrawing: false, // 判断是否绘制的字段
       arrowType: 'arrow', // 判断要绘制的图形
@@ -836,7 +916,6 @@ export default {
           this.selectedShapeName = selected[0].name() // 将选中的单个值name修改后需将右侧attr同步修改
           const attrs = selected[0].getAttrs()
           const type = selected[0].name().split('-')[0]
-          console.log(attrs, 'attrs')
           this.attr = setAttr(type, attrs, this.attr)
         } else {
           this.selectedShapeName = ''
@@ -915,9 +994,10 @@ export default {
       transformerNode.getLayer().draw()
       const textPosition = e.target.absolutePosition()
       const stageBox = this.$refs.stage.getNode().container().getBoundingClientRect()
+      const offset = e.target.getAttr('offset')
       const areaPosition = {
-        x: stageBox.left + textPosition.x,
-        y: stageBox.top + textPosition.y
+        x: stageBox.left + textPosition.x - offset.x,
+        y: stageBox.top + textPosition.y - offset.y
       }
       const textArea = this.$refs.textArea
       textArea.style.display = 'block'

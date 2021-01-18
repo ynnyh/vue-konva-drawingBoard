@@ -64,6 +64,9 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
   let obj = {
     draggable: params.draggable,
     rotate: Math.ceil(params.rotation) || 0,
+    strokeEnabled: params.strokeEnabled,
+    stroke: params.stroke,
+    strokeWidth: params.strokeWidth,
   }
   switch (type) {
     case 'rect':
@@ -97,6 +100,10 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
       break
     default:
       return
+  }
+  if (type !== 'line') {
+    obj.fillEnabled = params.fillEnabled
+    obj.fill = params.fill
   }
   return {
     ...data,
