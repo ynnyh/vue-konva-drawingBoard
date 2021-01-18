@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-18 11:34:37
+ * @LastEditTime: 2021-01-18 11:40:04
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -216,7 +216,6 @@
                 :config="{
                   x: Math.min(rect.x, rect.x + rect.width),
                   y: Math.min(rect.y, rect.y + rect.height),
-                  offset: rect.offset,
                   width: Math.abs(rect.width),
                   height: Math.abs(rect.height),
                   fillEnable: false,
@@ -826,10 +825,6 @@ export default {
         } else {
           currentRect.width = pos.x - currentRect.x
           currentRect.height = pos.y - currentRect.y
-        }
-        currentRect.offset = {
-          x: currentRect.width / 2,
-          y: currentRect.height / 2
         }
       } else if (this.arrowType === 'circle') {
         const pos = this.$refs.stage.getNode().getPointerPosition()
