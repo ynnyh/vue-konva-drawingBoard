@@ -91,6 +91,7 @@ export function setAttr (type, params, data) { // 图形类型，图形自身参
       break
     case 'text':
       obj.fontSize = params.fontSize
+      obj.fontFamily = params.fontFamily
       obj.offset = {
         x: 0,
         y: 0,

@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-18 11:40:04
+ * @LastEditTime: 2021-01-18 15:15:53
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -348,11 +348,10 @@
                   offset: text.offset,
                   text: 'hello world',
                   fontSize: Math.abs(text.fontSize),
-                  fontFamily: 'Calibri',
+                  fontFamily: 'Arial',
                   name: text.name,
-                  strokeEnabled: true,
-                  stroke: '#000',
-                  strokeWidth: 1,
+                  strokeEnabled: false,
+                  fill: '#000',
                   fillEnabled: true,
                   scaleX: text.scaleX,
                   scaleY: text.scaleY,
@@ -376,7 +375,10 @@
         </el-main>
         <el-aside width="16%" class="rightPart">
           <h3>属性栏</h3>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'rect'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'rect'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">宽度</span>
             </el-col>
@@ -389,7 +391,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'rect'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'rect'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">高度</span>
             </el-col>
@@ -403,6 +408,7 @@
             </el-col>
           </el-row>
           <el-row
+            class="attr-row"
             v-show="
               selectedShapeName.split('-')[0] === 'triangle' ||
               selectedShapeName.split('-')[0] === 'pentagon' ||
@@ -421,7 +427,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'arc'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">内半径</span>
             </el-col>
@@ -434,7 +443,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'arc'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">外半径</span>
             </el-col>
@@ -447,7 +459,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'arc'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'arc'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">角度</span>
             </el-col>
@@ -460,7 +475,10 @@
               ></el-slider
             ></el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'circle'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'circle'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">X半径</span>
             </el-col>
@@ -473,7 +491,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'circle'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'circle'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">Y半径</span>
             </el-col>
@@ -486,7 +507,10 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] === 'text'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'text'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">字号</span>
             </el-col>
@@ -499,7 +523,30 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row
+            v-show="selectedShapeName.split('-')[0] === 'text'"
+            class="attr-row"
+          >
+            <el-col :span="6">
+              <span class="attr">字体</span>
+            </el-col>
+            <el-col :span="17">
+              <el-select
+                v-model="attr.fontFamily"
+                placeholder="请选择字体"
+                @change="(value) => handleChange(value, 'fontFamily')"
+              >
+                <el-option
+                  v-for="item in fontFamily"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-col>
+          </el-row>
+          <el-row class="attr-row">
             <el-col :span="6">
               <span class="attr">描边</span>
             </el-col>
@@ -514,12 +561,13 @@
               ></el-switch>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row class="attr-row">
             <el-col :span="6">
               <span class="attr">描边宽度</span>
             </el-col>
             <el-col :span="17">
               <el-input-number
+                :disabled="selectedShapeName === ''"
                 v-model="attr.strokeWidth"
                 :min="0"
                 :precision="0"
@@ -527,18 +575,22 @@
               ></el-input-number>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row class="attr-row">
             <el-col :span="6">
               <span class="attr">描边颜色</span>
             </el-col>
             <el-col :span="6">
               <el-color-picker
+                :disabled="selectedShapeName === ''"
                 v-model="attr.stroke"
                 @change="(value) => handleChange(value, 'stroke')"
               ></el-color-picker>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] !== 'line'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">填充</span>
             </el-col>
@@ -553,18 +605,25 @@
               ></el-switch>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] !== 'line'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">填充颜色</span>
             </el-col>
             <el-col :span="6">
               <el-color-picker
+                :disabled="selectedShapeName === ''"
                 v-model="attr.fill"
                 @change="(value) => handleChange(value, 'fill')"
               ></el-color-picker>
             </el-col>
           </el-row>
-          <el-row v-show="selectedShapeName.split('-')[0] !== 'line'">
+          <el-row
+            v-show="selectedShapeName.split('-')[0] !== 'line'"
+            class="attr-row"
+          >
             <el-col :span="6">
               <span class="attr">旋转</span>
             </el-col>
@@ -578,7 +637,7 @@
               ></el-slider>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row class="attr-row">
             <el-col :span="6">
               <span class="attr">拖拽</span>
             </el-col>
@@ -627,6 +686,7 @@ export default {
         stroke: '',
         fillEnabled: true,
         fill: '',
+        fontFamily: '',
       },
       isDrawing: false, // 判断是否绘制的字段
       arrowType: 'arrow', // 判断要绘制的图形
@@ -651,6 +711,60 @@ export default {
         x: 0,
         y: 0,
       },
+      fontFamily: [
+        {
+          value: "'Arial'",
+          label: '默认字体',
+        },
+        {
+          value: "'SimSun'",
+          label: '宋体',
+        },
+        {
+          value: "'SimHei'",
+          label: '黑体',
+        },
+        {
+          value: "'Microsoft YaHei'",
+          label: '微软雅黑',
+        },
+        {
+          value: "'Microsoft JhengHei'",
+          label: '微软正黑体',
+        },
+        {
+          value: "'NSimSun'",
+          label: '新宋体',
+        },
+        {
+          value: "'PMingLiU'",
+          label: '新细明体',
+        },
+        {
+          value: "'MingLiU'",
+          label: '细明体',
+        },
+        {
+          value: "'DFKai-SB'",
+          label: '标楷体',
+        },
+        {
+          value: "'FangSong'",
+          label: '仿宋',
+        },
+        {
+          value: "'KaiTi'",
+          label: '楷体',
+        },
+        {
+          value: "'FangSong_GB2312'",
+          label: '仿宋_GB2312',
+        },
+        {
+          value: "'KaiTi_GB2312'",
+          label: '楷体_GB2312'
+        }
+      ],
     }
   },
   mounted () {
@@ -1053,7 +1167,11 @@ export default {
       if (selectedShape === 'rect' && name === 'rotation') {
         node.rotate(value)
       }
-      node.setAttr(name, value)
+      if (name === 'fontFamily') {
+        node.fontFamily(value)
+      } else {
+        node.setAttr(name, value)
+      }
       transformerNode.getLayer().batchDraw()
     },
   },
@@ -1070,6 +1188,9 @@ export default {
     padding-right: 8px;
     .attr {
       line-height: 40px;
+    }
+    .attr-row {
+      margin-bottom: 8px;
     }
   }
 }
