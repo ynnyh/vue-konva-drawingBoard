@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-18 15:15:53
+ * @LastEditTime: 2021-01-18 15:34:12
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -374,6 +374,9 @@
           </v-stage>
         </el-main>
         <el-aside width="16%" class="rightPart">
+          <el-button type="primary" @click="handleExport" class="export"
+            >导出图片</el-button
+          >
           <h3>属性栏</h3>
           <el-row
             v-show="selectedShapeName.split('-')[0] === 'rect'"
@@ -1174,6 +1177,20 @@ export default {
       }
       transformerNode.getLayer().batchDraw()
     },
+    // 导出图片
+    handleExport () {
+      const stage = this.$refs.stage.getNode()
+      const url = stage.toDataURL({ pixelRatio: 3 })
+      this.downloadURI(url, 'stage.png')
+    },
+    downloadURI (uri, name) {
+      let link = document.createElement('a')
+      link.download = name
+      link.href = uri
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   },
 }
 </script>
@@ -1185,12 +1202,20 @@ export default {
     line-height: 56px;
   }
   .rightPart {
+    position: relative;
     padding-right: 8px;
     .attr {
       line-height: 40px;
     }
     .attr-row {
       margin-bottom: 8px;
+    }
+    .export {
+      position: absolute;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      margin: auto;
     }
   }
 }
