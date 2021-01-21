@@ -1,7 +1,7 @@
 <!--
  * @Author: 月魂
  * @Date: 2020-12-30 13:49:59
- * @LastEditTime: 2021-01-18 15:34:12
+ * @LastEditTime: 2021-01-21 15:57:20
  * @LastEditors: 月魂
  * @Description: 
  * @FilePath: \vue-konva-drawingBoard\src\views\Konva.vue
@@ -209,7 +209,12 @@
             @mouseup="handleMouseUp"
             @click="handleClick"
           >
-            <v-layer>
+            <v-layer
+              ref="layer"
+              draggable="true"
+              @dragmove="onLayerDragMove"
+              @dragend="onLayerDragEnd"
+            >
               <v-rect
                 v-for="rect in rects"
                 :key="rect.name"
@@ -668,6 +673,7 @@ const kWidth = document.body.clientWidth * 0.8
 const kHeight = window.innerHeight
 let x1, y1, x2, y2
 let transformerNode = ''
+const GUIDELINE_OFFSET = 5
 export default {
   name: 'konva',
   data () {
@@ -1190,7 +1196,191 @@ export default {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-    }
+    },
+    // on layer drag move
+    onLayerDragMove (e) {
+      const layer = this.$refs.layer.getNode()
+      // clear all previous lines on the screen
+      layer.find('.guid-line').destroy()
+      // find possible snapping lines
+      const lineGuideStops = this.getLineGuideStops(e.target)
+      // find snapping points of current object
+      const itemBounds = this.getObjectSnappingEdges(e.target)
+
+      // now find where can we snap current object
+      const guides = this.getGuides(lineGuideStops, itemBounds)
+
+      // do nothing of no snapping
+      if (!guides.length) {
+        return
+      }
+
+      this.drawGuides(guides)
+    },
+    // 移动时捕获对象
+    getLineGuideStops (skipShape) {
+      const stage = this.$refs.stage.getNode()
+      // we can snap to stage borders and the center of the stage
+      let vertical = [0, stage.width() / 2, stage.width()]
+      let horizontal = [0, stage.height() / 2, stage.height()]
+      // and we snap over edges and center of each object on the canvas
+      stage.find('Rect, Ellipse, RegularPolygon, Line, Arc, Text').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return
+        }
+        const box = guideItem.getClientRect()
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2])
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2])
+      })
+      return {
+        vertical: vertical.flat(),
+        horizontal: horizontal.flat(),
+      }
+    },
+    // what points of the object will trigger to snapping?
+    // it can be just center of the object
+    // but we will enable all edges and center
+    getObjectSnappingEdges (node) {
+      const box = node.getClientRect()
+      const absPos = node.absolutePosition()
+
+      return {
+        vertical: [
+          {
+            guide: Math.round(box.x),
+            offset: Math.round(absPos.x - box.x),
+            snap: 'start',
+          },
+          {
+            guide: Math.round(box.x + box.width / 2),
+            offset: Math.round(absPos.x - box.x - box.width / 2),
+            snap: 'center',
+          },
+          {
+            guide: Math.round(box.x + box.width),
+            offset: Math.round(absPos.x - box.x - box.width),
+            snap: 'end',
+          },
+        ],
+        horizontal: [
+          {
+            guide: Math.round(box.y),
+            offset: Math.round(absPos.y - box.y),
+            snap: 'start',
+          },
+          {
+            guide: Math.round(box.y + box.height / 2),
+            offset: Math.round(absPos.y - box.y - box.height / 2),
+            snap: 'center',
+          },
+          {
+            guide: Math.round(box.y + box.height),
+            offset: Math.round(absPos.y - box.y - box.height),
+            snap: 'end',
+          },
+        ],
+      }
+    },
+    // find all snapping possibilities
+    getGuides (lineGuideStops, itemBounds) {
+      let resultV = []
+      let resultH = []
+
+      lineGuideStops.vertical.forEach((lineGuide) => {
+        itemBounds.vertical.forEach((itemBound) => {
+          const diff = Math.abs(lineGuide - itemBound.guide)
+          // if the distance between guild line and object snap point is close we can consider this for snapping
+          if (diff < GUIDELINE_OFFSET) {
+            resultV.push({
+              lineGuide: lineGuide,
+              diff: diff,
+              snap: itemBound.snap,
+              offset: itemBound.offset,
+            })
+          }
+        })
+      })
+
+      lineGuideStops.horizontal.forEach((lineGuide) => {
+        itemBounds.horizontal.forEach((itemBound) => {
+          const diff = Math.abs(lineGuide - itemBound.guide)
+          if (diff < GUIDELINE_OFFSET) {
+            resultH.push({
+              lineGuide: lineGuide,
+              diff: diff,
+              snap: itemBound.snap,
+              offset: itemBound.offset,
+            })
+          }
+        })
+      })
+
+      let guides = []
+
+      // find closest snap
+      const minV = resultV.sort((a, b) => a.diff - b.diff)[0]
+      const minH = resultH.sort((a, b) => a.diff - b.diff)[0]
+      if (minV) {
+        guides.push({
+          lineGuide: minV.lineGuide,
+          offset: minV.offset,
+          orientation: 'V',
+          snap: minV.snap,
+        })
+      }
+      if (minH) {
+        guides.push({
+          lineGuide: minH.lineGuide,
+          offset: minH.offset,
+          orientation: 'H',
+          snap: minH.snap,
+        })
+      }
+      return guides
+    },
+    drawGuides (guides) {
+      const layer = this.$refs.layer.getNode()
+      guides.forEach((lg) => {
+        if (lg.orientation === 'H') {
+          const line = new Konva.Line({
+            points: [-6000, 0, 6000, 0],
+            stroke: 'rgb(0, 161, 255)',
+            strokeWidth: 1,
+            name: 'guid-line',
+            dash: [4, 6],
+          })
+          layer.add(line)
+          line.absolutePosition({
+            x: 0,
+            y: lg.lineGuide,
+          })
+          layer.batchDraw()
+        } else if (lg.orientation === 'V') {
+          const line = new Konva.Line({
+            points: [0, -6000, 0, 6000],
+            stroke: 'rgb(0, 161, 255)',
+            strokeWidth: 1,
+            name: 'guid-line',
+            dash: [4, 6],
+          })
+          layer.add(line)
+          line.absolutePosition({
+            x: lg.lineGuide,
+            y: 0,
+          })
+          layer.batchDraw()
+        }
+      })
+    },
+    // on layer drag end
+    onLayerDragEnd () {
+      const layer = this.$refs.layer.getNode()
+      // clear all previous lines on the screen
+      layer.find('.guid-line').destroy()
+      layer.batchDraw()
+    },
+
   },
 }
 </script>
