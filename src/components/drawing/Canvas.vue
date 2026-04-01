@@ -170,6 +170,22 @@
           }"
           @dragend="handleShapeDragEnd"
         ></v-text>
+        <v-image
+          v-for="image in images"
+          :key="image.name"
+          :config="{
+            x: image.x,
+            y: image.y,
+            image: image.imageEl,
+            width: image.width,
+            height: image.height,
+            name: image.name,
+            scaleX: image.scaleX,
+            scaleY: image.scaleY,
+            draggable: image.draggable,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-image>
         <v-rect
           :config="{
             ...this.rectBox,
@@ -233,6 +249,10 @@ export default {
       default: () => []
     },
     texts: {
+      type: Array,
+      default: () => []
+    },
+    images: {
       type: Array,
       default: () => []
     },

@@ -19,6 +19,7 @@
         <tool-bar
           :arrowType="arrowType"
           @change-arrow-type="changeArrowType"
+          @import-image="handleImportImage"
         />
         <canvas
           :arrowType="arrowType"
@@ -30,6 +31,7 @@
           :arcs="arcs"
           :lines="lines"
           :texts="texts"
+          :images="images"
           :selectedShapeName="selectedShapeName"
           :attr="attr"
           @draw-start="handleDrawStart"
@@ -96,6 +98,7 @@ export default {
       arcs: [],
       lines: [],
       texts: [],
+      images: [],
       selectedShapeName: '',
       // 撤销/重做历史
       history: [],
@@ -150,6 +153,9 @@ export default {
                 break
               case 'text':
                 this.texts = this.texts.filter(r => r.name !== name)
+                break
+              case 'image':
+                this.images = this.images.filter(r => r.name !== name)
                 break
               default:
                 return
@@ -365,7 +371,18 @@ export default {
         hexagons: JSON.parse(JSON.stringify(this.hexagons)),
         arcs: JSON.parse(JSON.stringify(this.arcs)),
         lines: JSON.parse(JSON.stringify(this.lines)),
-        texts: JSON.parse(JSON.stringify(this.texts))
+        texts: JSON.parse(JSON.stringify(this.texts)),
+        images: JSON.parse(JSON.stringify(this.images.map(img => ({
+          x: img.x,
+          y: img.y,
+          width: img.width,
+          height: img.height,
+          name: img.name,
+          scaleX: img.scaleX,
+          scaleY: img.scaleY,
+          draggable: img.draggable,
+          src: img.src
+        }))))
       }
       
       this.history = this.history.slice(0, this.historyIndex + 1)
@@ -401,6 +418,14 @@ export default {
       this.lines = snapshot.lines
       this.texts = snapshot.texts
       
+      // 恢复图片需要重新加载
+      this.images = []
+      if (snapshot.images && snapshot.images.length > 0) {
+        snapshot.images.forEach(imgData => {
+          this.loadImageFromSrc(imgData.src, imgData)
+        })
+      }
+      
       this.$refs.canvas.getTransformer().nodes([])
       this.selectedShapeName = ''
       
@@ -412,6 +437,58 @@ export default {
     handleShapeMoved(node) {
       // 保存历史记录
       this.saveHistory()
+    },
+    // 处理图片导入
+    handleImportImage(file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          // 计算图片尺寸，限制最大宽高
+          const maxWidth = 400
+          const maxHeight = 400
+          let width = img.width
+          let height = img.height
+          
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height)
+            width = width * ratio
+            height = height * ratio
+          }
+          
+          // 创建图片对象
+          const imageData = {
+            imageEl: img,
+            src: e.target.result,
+            x: 100,
+            y: 100,
+            width: width,
+            height: height,
+            name: 'image-' + Date.now(),
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          }
+          
+          // 保存历史并添加图片
+          this.images.push(imageData)
+          this.saveHistory()
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    },
+    // 从 src 加载图片（用于撤销/重做）
+    loadImageFromSrc(src, imgData) {
+      const img = new Image()
+      img.onload = () => {
+        const imageData = {
+          ...imgData,
+          imageEl: img
+        }
+        this.images.push(imageData)
+      }
+      img.src = src
     },
 
   },
