@@ -273,6 +273,10 @@ export default {
       type: Array,
       default: () => []
     },
+    beziers: {
+      type: Array,
+      default: () => []
+    },
     selectedShapeName: {
       type: String,
       default: ''
@@ -355,7 +359,7 @@ export default {
           transformerNode.getLayer().batchDraw()
         })
         const shapes = this.$refs.stage.getNode().find(node => {
-          if (node.getClassName() === 'Ellipse' || node.id() === 'rect' || node.getClassName() === 'RegularPolygon' || node.getClassName() === 'Arc' || node.getClassName() === 'Line' || node.getClassName() === 'Text') return true
+          if (node.getClassName() === 'Ellipse' || node.id() === 'rect' || node.getClassName() === 'RegularPolygon' || node.getClassName() === 'Arc' || node.getClassName() === 'Line' || node.getClassName() === 'Text' || node.getClassName() === 'Image') return true
         }).toArray()
         const box = this.$refs.rectBox.getNode().getClientRect()
         const selected = shapes.filter((shape) =>
@@ -386,7 +390,7 @@ export default {
           transformerNode.getLayer().draw()
           return
         }
-        if (e.target.id() === 'rect' || e.target.getClassName() === 'Ellipse' || e.target.getClassName() === 'RegularPolygon' || e.target.getClassName() === 'Arc' || e.target.getClassName() === 'Line' || e.target.getClassName() === 'Text') {
+        if (e.target.id() === 'rect' || e.target.getClassName() === 'Ellipse' || e.target.getClassName() === 'RegularPolygon' || e.target.getClassName() === 'Arc' || e.target.getClassName() === 'Line' || e.target.getClassName() === 'Text' || e.target.getClassName() === 'Image') {
           const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey
           const isSelected = transformerNode.nodes().indexOf(e.target) >= 0
           if (!metaPressed && !isSelected) {
@@ -463,7 +467,7 @@ export default {
       const stage = this.$refs.stage.getNode()
       let vertical = [0, stage.width() / 2, stage.width()]
       let horizontal = [0, stage.height() / 2, stage.height()]
-      stage.find('Rect, Ellipse, RegularPolygon, Line, Arc, Text').forEach((guideItem) => {
+      stage.find('Rect, Ellipse, RegularPolygon, Line, Arc, Text, Image').forEach((guideItem) => {
         if (guideItem === skipShape) {
           return
         }

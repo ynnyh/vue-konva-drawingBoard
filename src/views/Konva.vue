@@ -32,6 +32,7 @@
           :lines="lines"
           :texts="texts"
           :images="images"
+          :beziers="beziers"
           :selectedShapeName="selectedShapeName"
           :attr="attr"
           @draw-start="handleDrawStart"
@@ -99,6 +100,7 @@ export default {
       lines: [],
       texts: [],
       images: [],
+      beziers: [],
       selectedShapeName: '',
       // 撤销/重做历史
       history: [],
@@ -157,6 +159,9 @@ export default {
               case 'image':
                 this.images = this.images.filter(r => r.name !== name)
                 break
+              case 'bezier':
+                this.beziers = this.beziers.filter(r => r.name !== name)
+                break
               default:
                 return
             }
@@ -208,6 +213,17 @@ export default {
           break
         case 'text':
           this.texts = drawByDown(pos, this.texts, 'text')
+          break
+        case 'bezier':
+          this.beziers.push({
+            points: [pos.x, pos.y, pos.x, pos.y, pos.x, pos.y],
+            name: 'bezier-' + Date.now(),
+            stroke: '#000',
+            strokeWidth: 2,
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          })
           break
         default:
           return
@@ -275,6 +291,18 @@ export default {
           x: node.width() / 2,
           y: node.height() / 2
         }
+      } else if (type === 'bezier') {
+        let currentBezier = this.beziers[this.beziers.length - 1]
+        const startX = currentBezier.points[0]
+        const startY = currentBezier.points[1]
+        currentBezier.points = [
+          startX,
+          startY,
+          (startX + pos.x) / 2 - 50,
+          (startY + pos.y) / 2 - 50,
+          pos.x,
+          pos.y
+        ]
       }
     },
     handleDrawEnd() {
@@ -372,6 +400,7 @@ export default {
         arcs: JSON.parse(JSON.stringify(this.arcs)),
         lines: JSON.parse(JSON.stringify(this.lines)),
         texts: JSON.parse(JSON.stringify(this.texts)),
+        beziers: JSON.parse(JSON.stringify(this.beziers)),
         images: JSON.parse(JSON.stringify(this.images.map(img => ({
           x: img.x,
           y: img.y,
@@ -417,6 +446,7 @@ export default {
       this.arcs = snapshot.arcs
       this.lines = snapshot.lines
       this.texts = snapshot.texts
+      this.beziers = snapshot.beziers || []
       
       // 恢复图片需要重新加载
       this.images = []
