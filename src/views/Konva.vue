@@ -37,6 +37,7 @@
           @draw-end="handleDrawEnd"
           @select-shape="handleSelectShape"
           @edit-text="handleEditText"
+          @shape-moved="handleShapeMoved"
           ref="canvas"
         />
         <property-panel
@@ -406,6 +407,11 @@ export default {
       if (this.$refs.canvas) {
         this.$refs.canvas.getTransformer().getLayer().batchDraw()
       }
+    },
+    // 处理图形移动事件（边界检测后）
+    handleShapeMoved(node) {
+      // 保存历史记录
+      this.saveHistory()
     },
 
   },

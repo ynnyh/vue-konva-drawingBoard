@@ -32,6 +32,7 @@
             scaleY: rect.scaleY,
             draggable: rect.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         >
         </v-rect>
         <v-ellipse
@@ -51,6 +52,7 @@
             draggable: cir.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-ellipse>
         <v-regular-polygon
           v-for="triangle in triangles"
@@ -69,6 +71,7 @@
             draggable: triangle.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-regular-polygon
           v-for="pentagon in pentagons"
@@ -87,6 +90,7 @@
             draggable: pentagon.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-regular-polygon
           v-for="hexagon in hexagons"
@@ -105,6 +109,7 @@
             draggable: hexagon.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-arc
           v-for="arc in arcs"
@@ -124,6 +129,7 @@
             stroke: '#000',
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-arc>
         <v-line
           v-for="line in lines"
@@ -141,6 +147,7 @@
             scaleY: line.scaleY,
             draggable: line.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-line>
         <v-text
           v-for="text in texts"
@@ -161,6 +168,7 @@
             scaleY: text.scaleY,
             draggable: text.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-text>
         <v-rect
           :config="{
@@ -472,6 +480,40 @@ export default {
         ],
       }
     },
+    // 边界检测
+    checkBounds(node) {
+      const stage = this.$refs.stage.getNode()
+      const box = node.getClientRect()
+      const pos = node.position()
+      
+      // 计算实际位置
+      let newX = pos.x
+      let newY = pos.y
+      
+      // 左边界
+      if (box.x < 0) {
+        newX = newX - box.x
+      }
+      // 上边界
+      if (box.y < 0) {
+        newY = newY - box.y
+      }
+      // 右边界
+      if (box.x + box.width > stage.width()) {
+        newX = stage.width() - box.width - (box.x - pos.x)
+      }
+      // 下边界
+      if (box.y + box.height > stage.height()) {
+        newY = stage.height() - box.height - (box.y - pos.y)
+      }
+      
+      // 如果位置有变化，更新节点位置
+      if (newX !== pos.x || newY !== pos.y) {
+        node.position({ x: newX, y: newY })
+        return true
+      }
+      return false
+    },
     getGuides(lineGuideStops, itemBounds) {
       let resultV = []
       let resultH = []
@@ -563,6 +605,17 @@ export default {
       const layer = this.$refs.layer.getNode()
       layer.find('.guid-line').destroy()
       layer.batchDraw()
+    },
+    // 图形拖动结束处理
+    handleShapeDragEnd(e) {
+      const node = e.target
+      const boundsChanged = this.checkBounds(node)
+      if (boundsChanged) {
+        // 如果位置发生了变化，重新绘制
+        node.getLayer().batchDraw()
+        // 触发更新事件，通知父组件保存历史
+        this.$emit('shape-moved', node)
+      }
     },
     getStage() {
       return this.$refs.stage.getNode()
