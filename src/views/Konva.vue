@@ -774,6 +774,10 @@ export default {
           label: '楷体_GB2312'
         }
       ],
+      // 撤销/重做历史
+      history: [],
+      historyIndex: -1,
+      maxHistory: 50,
     }
   },
   mounted () {
@@ -786,44 +790,61 @@ export default {
   },
   methods: {
     onKeyDown (e) {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const metaKey = isMac ? e.metaKey : e.ctrlKey
+      
       if (e.keyCode === 46) {
         // 此处需同步删除data数组中的数据
         const nodes = transformerNode.nodes()
-        nodes.map(item => {
-          const name = item.getAttr('name')
-          const shape = name.split('-')[0]
-          switch (shape) {
-            case 'rect':
-              this.rects = delShape(name, this.rects)
-              break
-            case 'circle':
-              this.circles = delShape(name, this.circles)
-              break
-            case 'triangle':
-              this.triangles = delShape(name, this.triangles)
-              break
-            case 'pentagon':
-              this.pentagons = delShape(name, this.pentagons)
-              break
-            case 'hexagon':
-              this.hexagons = delShape(name, this.hexagons)
-              break
-            case 'arc':
-              this.arcs = delShape(name, this.arcs)
-              break
-            case 'line':
-              this.lines = delShape(name, this.lines)
-              break
-            case 'text':
-              this.texts = delShape(name, this.texts)
-              break
-            default:
-              return
-          }
-          item.destroy()
-        })
-        transformerNode.nodes([])
-        transformerNode.getLayer().draw()
+        if (nodes.length > 0) {
+          // 保存历史
+          this.saveHistory()
+          
+          nodes.map(item => {
+            const name = item.getAttr('name')
+            const shape = name.split('-')[0]
+            switch (shape) {
+              case 'rect':
+                this.rects = delShape(name, this.rects)
+                break
+              case 'circle':
+                this.circles = delShape(name, this.circles)
+                break
+              case 'triangle':
+                this.triangles = delShape(name, this.triangles)
+                break
+              case 'pentagon':
+                this.pentagons = delShape(name, this.pentagons)
+                break
+              case 'hexagon':
+                this.hexagons = delShape(name, this.hexagons)
+                break
+              case 'arc':
+                this.arcs = delShape(name, this.arcs)
+                break
+              case 'line':
+                this.lines = delShape(name, this.lines)
+                break
+              case 'text':
+                this.texts = delShape(name, this.texts)
+                break
+              default:
+                return
+            }
+            item.destroy()
+          })
+          transformerNode.nodes([])
+          transformerNode.getLayer().draw()
+        }
+      } else if (metaKey && e.key === 'z' && !e.shiftKey) {
+        // 撤销操作
+        this.undo()
+      } else if (metaKey && e.key === 'y') {
+        // 重做操作
+        this.redo()
+      } else if (metaKey && e.key === 'z' && e.shiftKey) {
+        // 重做操作 (Mac 上的 Shift+Cmd+Z)
+        this.redo()
       }
     },
     onKeyUp (e) {
@@ -1040,6 +1061,9 @@ export default {
         }
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
+      } else {
+        // 绘制完成后保存历史
+        this.saveHistory()
       }
     },
     // 监听点击事件，可以判断单击图形
@@ -1153,6 +1177,9 @@ export default {
     // 多行文本keydown
     handleKeyDown (e) {
       if (e.keyCode === 13 && !e.shiftKey) {
+        // 保存历史
+        this.saveHistory()
+        
         const textNode = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
         textNode.text(this.$refs.textArea.value)
         this.$refs.textArea.style.display = 'none'
@@ -1163,6 +1190,9 @@ export default {
     },
     // textarea失去焦点
     handleBlur (e) {
+      // 保存历史
+      this.saveHistory()
+      
       const textNode = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
       textNode.text(e.target.value)
       e.target.style.display = 'none'
@@ -1171,6 +1201,9 @@ export default {
       transformerNode.getLayer().draw()
     },
     handleChange (value, name) { // 右侧属性值变更映射到图形上
+      // 保存历史
+      this.saveHistory()
+      
       const node = this.$refs.stage.getNode().findOne('.' + this.selectedShapeName)
       const selectedShape = this.selectedShapeName.split('-')[0]
       if (selectedShape === 'rect' && name === 'rotation') {
@@ -1379,6 +1412,71 @@ export default {
       // clear all previous lines on the screen
       layer.find('.guid-line').destroy()
       layer.batchDraw()
+    },
+    
+    // 保存历史记录
+    saveHistory() {
+      // 保存当前所有图形状态
+      const snapshot = {
+        rects: JSON.parse(JSON.stringify(this.rects)),
+        circles: JSON.parse(JSON.stringify(this.circles)),
+        triangles: JSON.parse(JSON.stringify(this.triangles)),
+        pentagons: JSON.parse(JSON.stringify(this.pentagons)),
+        hexagons: JSON.parse(JSON.stringify(this.hexagons)),
+        arcs: JSON.parse(JSON.stringify(this.arcs)),
+        lines: JSON.parse(JSON.stringify(this.lines)),
+        texts: JSON.parse(JSON.stringify(this.texts))
+      }
+      
+      // 清除当前索引之后的历史
+      this.history = this.history.slice(0, this.historyIndex + 1)
+      this.history.push(snapshot)
+      
+      // 限制历史记录数量
+      if (this.history.length > this.maxHistory) {
+        this.history.shift()
+      }
+      
+      this.historyIndex = this.history.length - 1
+    },
+    
+    // 撤销操作
+    undo() {
+      if (this.historyIndex > 0) {
+        this.historyIndex--
+        const snapshot = this.history[this.historyIndex]
+        this.restoreFromSnapshot(snapshot)
+      }
+    },
+    
+    // 重做操作
+    redo() {
+      if (this.historyIndex < this.history.length - 1) {
+        this.historyIndex++
+        const snapshot = this.history[this.historyIndex]
+        this.restoreFromSnapshot(snapshot)
+      }
+    },
+    
+    // 从快照恢复状态
+    restoreFromSnapshot(snapshot) {
+      this.rects = snapshot.rects
+      this.circles = snapshot.circles
+      this.triangles = snapshot.triangles
+      this.pentagons = snapshot.pentagons
+      this.hexagons = snapshot.hexagons
+      this.arcs = snapshot.arcs
+      this.lines = snapshot.lines
+      this.texts = snapshot.texts
+      
+      // 清空选择
+      transformerNode.nodes([])
+      this.selectedShapeName = ''
+      
+      // 重新绘制
+      if (this.$refs.layer) {
+        this.$refs.layer.getNode().batchDraw()
+      }
     },
 
   },
