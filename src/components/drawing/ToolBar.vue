@@ -208,6 +208,26 @@
           @change="handleImageSelect"
         />
       </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="贝塞尔曲线"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            v-bind:style="{
+              color: arrowType === 'bezier' ? '#f20' : '',
+            }"
+            @click="changeArrowType('bezier')"
+          >
+            <use xlink:href="#icon-bezier"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
     </el-row>
   </el-aside>
 </template>

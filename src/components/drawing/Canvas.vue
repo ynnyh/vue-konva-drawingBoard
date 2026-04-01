@@ -186,6 +186,23 @@
           }"
           @dragend="handleShapeDragEnd"
         ></v-image>
+        <v-line
+          v-for="bezier in beziers"
+          :key="bezier.name"
+          :config="{
+            points: bezier.points,
+            stroke: bezier.stroke || '#000',
+            strokeWidth: bezier.strokeWidth || 2,
+            lineCap: 'round',
+            lineJoin: 'round',
+            name: bezier.name,
+            scaleX: bezier.scaleX,
+            scaleY: bezier.scaleY,
+            draggable: bezier.draggable,
+            bezier: true,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-line>
         <v-rect
           :config="{
             ...this.rectBox,
