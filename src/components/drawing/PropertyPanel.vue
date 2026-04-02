@@ -282,6 +282,21 @@
         ></el-switch>
       </el-col>
     </el-row>
+    <el-row v-show="selectedShapeName !== ''" class="attr-row">
+      <el-col :span="24">
+        <span class="attr">层级调整</span>
+      </el-col>
+    </el-row>
+    <el-row v-show="selectedShapeName !== ''" class="attr-row">
+      <el-col :span="24">
+        <el-button-group>
+          <el-button size="small" @click="moveToTop">置顶</el-button>
+          <el-button size="small" @click="moveUp">上移</el-button>
+          <el-button size="small" @click="moveDown">下移</el-button>
+          <el-button size="small" @click="moveToBottom">置底</el-button>
+        </el-button-group>
+      </el-col>
+    </el-row>
   </el-aside>
 </template>
 
@@ -380,6 +395,18 @@ export default {
     },
     handleExport() {
       this.$emit('export')
+    },
+    moveToTop() {
+      this.$emit('move-to-top')
+    },
+    moveUp() {
+      this.$emit('move-up')
+    },
+    moveDown() {
+      this.$emit('move-down')
+    },
+    moveToBottom() {
+      this.$emit('move-to-bottom')
     }
   }
 }

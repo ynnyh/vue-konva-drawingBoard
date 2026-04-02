@@ -49,6 +49,10 @@
           :attr="attr"
           @change="handlePropertyChange"
           @export="handleExport"
+          @move-to-top="moveToTop"
+          @move-up="moveUp"
+          @move-down="moveDown"
+          @move-to-bottom="moveToBottom"
         />
       </el-container>
     </el-container>
@@ -549,6 +553,51 @@ export default {
         this.images.push(imageData)
       }
       img.src = src
+    },
+    // Z-Index 控制方法
+    moveToTop() {
+      if (!this.selectedShapeName) return
+      this.saveHistory()
+      const shapeType = this.selectedShapeName.split('-')[0]
+      const shapes = this[shapeType + 's']
+      const index = shapes.findIndex(s => s.name === this.selectedShapeName)
+      if (index > -1) {
+        const shape = shapes.splice(index, 1)[0]
+        shapes.push(shape)
+      }
+    },
+    moveUp() {
+      if (!this.selectedShapeName) return
+      this.saveHistory()
+      const shapeType = this.selectedShapeName.split('-')[0]
+      const shapes = this[shapeType + 's']
+      const index = shapes.findIndex(s => s.name === this.selectedShapeName)
+      if (index > -1 && index < shapes.length - 1) {
+        const shape = shapes.splice(index, 1)[0]
+        shapes.splice(index + 1, 0, shape)
+      }
+    },
+    moveDown() {
+      if (!this.selectedShapeName) return
+      this.saveHistory()
+      const shapeType = this.selectedShapeName.split('-')[0]
+      const shapes = this[shapeType + 's']
+      const index = shapes.findIndex(s => s.name === this.selectedShapeName)
+      if (index > 0) {
+        const shape = shapes.splice(index, 1)[0]
+        shapes.splice(index - 1, 0, shape)
+      }
+    },
+    moveToBottom() {
+      if (!this.selectedShapeName) return
+      this.saveHistory()
+      const shapeType = this.selectedShapeName.split('-')[0]
+      const shapes = this[shapeType + 's']
+      const index = shapes.findIndex(s => s.name === this.selectedShapeName)
+      if (index > -1) {
+        const shape = shapes.splice(index, 1)[0]
+        shapes.unshift(shape)
+      }
     },
 
   },
