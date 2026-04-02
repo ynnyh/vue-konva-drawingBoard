@@ -20,6 +20,8 @@
           :arrowType="arrowType"
           @change-arrow-type="changeArrowType"
           @import-image="handleImportImage"
+          @group-shapes="handleGroup"
+          @ungroup-shapes="handleUngroup"
         />
         <canvas
           :arrowType="arrowType"
@@ -107,6 +109,7 @@ export default {
       images: [],
       beziers: [],
       paths: [],
+      groups: [],
       selectedShapeName: '',
       // 撤销/重做历史
       history: [],
@@ -434,6 +437,7 @@ export default {
         texts: JSON.parse(JSON.stringify(this.texts)),
         beziers: JSON.parse(JSON.stringify(this.beziers)),
         paths: JSON.parse(JSON.stringify(this.paths)),
+        groups: JSON.parse(JSON.stringify(this.groups)),
         images: JSON.parse(JSON.stringify(this.images.map(img => ({
           x: img.x,
           y: img.y,
@@ -481,6 +485,7 @@ export default {
       this.texts = snapshot.texts
       this.beziers = snapshot.beziers || []
       this.paths = snapshot.paths || []
+      this.groups = snapshot.groups || []
       
       // 恢复图片需要重新加载
       this.images = []
@@ -598,6 +603,90 @@ export default {
         const shape = shapes.splice(index, 1)[0]
         shapes.unshift(shape)
       }
+    },
+    // 组合图形
+    handleGroup() {
+      this.saveHistory()
+      const transformer = this.$refs.canvas.getTransformer()
+      const nodes = transformer.nodes()
+      
+      if (nodes.length < 2) {
+        return
+      }
+      
+      // 获取所有选中图形的名称
+      const shapeNames = nodes.map(node => node.name())
+      
+      // 创建组对象
+      const group = {
+        name: 'group-' + Date.now(),
+        shapes: [],
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+        draggable: true
+      }
+      
+      // 从各数组中提取图形并添加到组中
+      const shapeArrays = ['rects', 'circles', 'triangles', 'pentagons', 'hexagons', 'arcs', 'lines', 'texts', 'images', 'beziers', 'paths']
+      
+      shapeArrays.forEach(arrayName => {
+        const array = this[arrayName]
+        const remaining = []
+        
+        array.forEach(shape => {
+          if (shapeNames.includes(shape.name)) {
+            group.shapes.push({
+              ...shape,
+              type: arrayName.slice(0, -1)
+            })
+          } else {
+            remaining.push(shape)
+          }
+        })
+        
+        this[arrayName] = remaining
+      })
+      
+      // 添加组到 groups 数组
+      this.groups.push(group)
+      
+      // 清空选择
+      transformer.nodes([])
+      transformer.getLayer().batchDraw()
+      this.selectedShapeName = ''
+    },
+    // 取消组合
+    handleUngroup() {
+      if (!this.selectedShapeName || !this.selectedShapeName.startsWith('group-')) {
+        return
+      }
+      
+      this.saveHistory()
+      const groupIndex = this.groups.findIndex(g => g.name === this.selectedShapeName)
+      
+      if (groupIndex === -1) {
+        return
+      }
+      
+      const group = this.groups.splice(groupIndex, 1)[0]
+      
+      // 将组中的图形放回各自的数组
+      group.shapes.forEach(shape => {
+        const arrayName = shape.type + 's'
+        if (this[arrayName]) {
+          const { type, ...shapeData } = shape
+          this[arrayName].push(shapeData)
+        }
+      })
+      
+      // 清空选择
+      const transformer = this.$refs.canvas.getTransformer()
+      transformer.nodes([])
+      transformer.getLayer().batchDraw()
+      this.selectedShapeName = ''
     },
 
   },
