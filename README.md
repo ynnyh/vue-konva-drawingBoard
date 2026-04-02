@@ -1,11 +1,11 @@
 # Vue-Konva 绘图板 (Drawing Board)
 
-[![在线预览](https://img.shields.io/badge/在线预览-GitHub%20Pages-brightgreen?style=for-the-badge)](https://ynnyh.github.io/drawingBoard/)
+[![在线预览](https://img.shields.io/badge/在线预览-GitHub%20Pages-brightgreen?style=for-the-badge)](https://ynnyh.github.io/vue-konva-drawingBoard/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 一个基于 Vue.js 和 Konva.js 构建的功能丰富的在线绘图工具，支持多种几何图形绘制、编辑和导出。
 
-**👉 [点击这里在线体验](https://ynnyh.github.io/drawingBoard/)**
+**👉 [点击这里在线体验](https://ynnyh.github.io/vue-konva-drawingBoard/)**
 
 ## 项目特性
 
