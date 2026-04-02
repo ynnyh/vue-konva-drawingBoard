@@ -347,10 +347,10 @@ export default {
       }
     },
     handleMouseDown(e) {
-      if (e.target !== e.target.getStage()) return
-      this.down = true
-      this.isDrawing = true
       if (this.arrowType === 'arrow') {
+        if (e.target !== e.target.getStage()) return
+        this.down = true
+        this.isDrawing = true
         if (e.target === e.target.getStage()) {
           x1 = this.$refs.stage.getNode().getPointerPosition().x
           y1 = this.$refs.stage.getNode().getPointerPosition().y
@@ -368,9 +368,12 @@ export default {
           transformerNode.getLayer().draw()
           return
         }
+      } else {
+        this.down = true
+        this.isDrawing = true
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        this.$emit('draw-start', pos, this.arrowType)
       }
-      const pos = this.$refs.stage.getNode().getPointerPosition()
-      this.$emit('draw-start', pos, this.arrowType)
     },
     handleMouseMove(e) {
       if (!this.isDrawing) return
