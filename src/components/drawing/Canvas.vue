@@ -314,7 +314,7 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: window.innerWidth - 60 - 280,
+        width: 800,
         height: window.innerHeight
       },
       rectBox: {
@@ -328,15 +328,24 @@ export default {
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)
+    this.$nextTick(() => {
+      this.updateCanvasSize()
+    })
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
     handleResize() {
-      this.configKonva.width = window.innerWidth - 60 - 280
-      this.configKonva.height = window.innerHeight
+      this.updateCanvasSize()
       this.$forceUpdate()
+    },
+    updateCanvasSize() {
+      const container = this.$el.parentElement
+      if (container) {
+        this.configKonva.width = container.clientWidth
+      }
+      this.configKonva.height = window.innerHeight
     },
     handleMouseDown(e) {
       if (e.target !== e.target.getStage()) return
