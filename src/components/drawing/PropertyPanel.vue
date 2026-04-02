@@ -437,7 +437,7 @@ export default {
 .rightPart {
   background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   
   .property-panel-container {

@@ -185,9 +185,7 @@
               :class="{ active: arrowType === 'image' }"
               @click="triggerImageUpload"
             >
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-image"></use>
-              </svg>
+              <span class="icon-emoji">🖼️</span>
             </div>
           </el-tooltip>
           <input
@@ -211,9 +209,7 @@
               :class="{ active: arrowType === 'bezier' }"
               @click="changeArrowType('bezier')"
             >
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-bezier"></use>
-              </svg>
+              <span class="icon-emoji">〰️</span>
             </div>
           </el-tooltip>
         </el-col>
@@ -230,9 +226,7 @@
               :class="{ active: arrowType === 'path' }"
               @click="changeArrowType('path')"
             >
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-path"></use>
-              </svg>
+              <span class="icon-emoji">✏️</span>
             </div>
           </el-tooltip>
         </el-col>
@@ -245,9 +239,7 @@
             placement="right"
           >
             <div class="tool-icon" @click="handleGroup">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-group"></use>
-              </svg>
+              <span class="icon-emoji">📦</span>
             </div>
           </el-tooltip>
         </el-col>
@@ -260,9 +252,7 @@
             placement="right"
           >
             <div class="tool-icon" @click="handleUngroup">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-ungroup"></use>
-              </svg>
+              <span class="icon-emoji">📤</span>
             </div>
           </el-tooltip>
         </el-col>
@@ -308,10 +298,11 @@ export default {
 .leftPart {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
+  box-sizing: border-box;
   
   :deep(.el-scrollbar__wrap) {
     overflow-x: hidden;
@@ -350,7 +341,7 @@ export default {
       color: white;
       box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
       
-      .icon {
+      .icon, .icon-emoji {
         color: white !important;
       }
     }
@@ -359,6 +350,11 @@ export default {
       font-size: 24px;
       color: #444;
       transition: color 0.3s ease;
+    }
+    
+    .icon-emoji {
+      font-size: 20px;
+      line-height: 1;
     }
   }
 }

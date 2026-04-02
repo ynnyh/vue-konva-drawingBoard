@@ -18,11 +18,15 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
 }
 // 调整编辑器侧边操作栏样式
 .el-aside {
@@ -30,9 +34,16 @@ body {
   color: #333;
   text-align: center;
   padding-top: 36px;
+  overflow: hidden;
 }
 
 .el-main {
   padding: 0 !important;
+  overflow: hidden;
+}
+
+.el-container {
+  height: 100%;
+  overflow: hidden;
 }
 </style>

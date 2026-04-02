@@ -696,5 +696,13 @@ export default {
 <style lang="less" scoped>
 .root {
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+:deep(.el-container) {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 </style>

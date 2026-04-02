@@ -241,8 +241,6 @@
 import Konva from 'konva'
 import { delShape, drawByDown, setAttr } from '../../utils/utils'
 
-const kWidth = document.body.clientWidth * 0.8
-const kHeight = window.innerHeight
 let x1, y1, x2, y2
 let transformerNode = ''
 const GUIDELINE_OFFSET = 5
@@ -316,8 +314,8 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: kWidth,
-        height: kHeight
+        width: window.innerWidth - 60 - 260,
+        height: window.innerHeight
       },
       rectBox: {
         visible: false,
@@ -328,7 +326,18 @@ export default {
       },
     }
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
+    handleResize() {
+      this.configKonva.width = window.innerWidth - 60 - 260
+      this.configKonva.height = window.innerHeight
+      this.$forceUpdate()
+    },
     handleMouseDown(e) {
       if (e.target !== e.target.getStage()) return
       this.down = true
