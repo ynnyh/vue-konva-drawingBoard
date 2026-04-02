@@ -248,6 +248,40 @@
           </svg>
         </el-tooltip>
       </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="组合"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            @click="handleGroup"
+          >
+            <use xlink:href="#icon-group"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="取消组合"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            @click="handleUngroup"
+          >
+            <use xlink:href="#icon-ungroup"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
     </el-row>
   </el-aside>
 </template>
@@ -275,6 +309,12 @@ export default {
         // 清空 input，允许重复选择同一文件
         e.target.value = ''
       }
+    },
+    handleGroup() {
+      this.$emit('group-shapes')
+    },
+    handleUngroup() {
+      this.$emit('ungroup-shapes')
     }
   }
 }

@@ -298,6 +298,10 @@ export default {
       type: Array,
       default: () => []
     },
+    groups: {
+      type: Array,
+      default: () => []
+    },
     selectedShapeName: {
       type: String,
       default: ''
