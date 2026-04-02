@@ -314,7 +314,7 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: window.innerWidth - 60 - 260,
+        width: window.innerWidth - 60 - 280,
         height: window.innerHeight
       },
       rectBox: {
@@ -334,7 +334,7 @@ export default {
   },
   methods: {
     handleResize() {
-      this.configKonva.width = window.innerWidth - 60 - 260
+      this.configKonva.width = window.innerWidth - 60 - 280
       this.configKonva.height = window.innerHeight
       this.$forceUpdate()
     },
