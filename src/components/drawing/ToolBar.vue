@@ -181,6 +181,73 @@
           </svg>
         </el-tooltip>
       </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="导入图片"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            v-bind:style="{
+              color: arrowType === 'image' ? '#f20' : '',
+            }"
+            @click="triggerImageUpload"
+          >
+            <use xlink:href="#icon-image"></use>
+          </svg>
+        </el-tooltip>
+        <input
+          ref="imageInput"
+          type="file"
+          accept="image/*"
+          style="display: none"
+          @change="handleImageSelect"
+        />
+      </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="贝塞尔曲线"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            v-bind:style="{
+              color: arrowType === 'bezier' ? '#f20' : '',
+            }"
+            @click="changeArrowType('bezier')"
+          >
+            <use xlink:href="#icon-bezier"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="路径绘制"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            v-bind:style="{
+              color: arrowType === 'path' ? '#f20' : '',
+            }"
+            @click="changeArrowType('path')"
+          >
+            <use xlink:href="#icon-path"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
     </el-row>
   </el-aside>
 </template>
@@ -197,6 +264,17 @@ export default {
   methods: {
     changeArrowType(type) {
       this.$emit('change-arrow-type', type)
+    },
+    triggerImageUpload() {
+      this.$refs.imageInput.click()
+    },
+    handleImageSelect(e) {
+      const file = e.target.files[0]
+      if (file) {
+        this.$emit('import-image', file)
+        // 清空 input，允许重复选择同一文件
+        e.target.value = ''
+      }
     }
   }
 }

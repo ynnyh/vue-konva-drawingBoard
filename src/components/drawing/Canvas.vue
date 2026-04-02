@@ -32,6 +32,7 @@
             scaleY: rect.scaleY,
             draggable: rect.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         >
         </v-rect>
         <v-ellipse
@@ -51,6 +52,7 @@
             draggable: cir.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-ellipse>
         <v-regular-polygon
           v-for="triangle in triangles"
@@ -69,6 +71,7 @@
             draggable: triangle.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-regular-polygon
           v-for="pentagon in pentagons"
@@ -87,6 +90,7 @@
             draggable: pentagon.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-regular-polygon
           v-for="hexagon in hexagons"
@@ -105,6 +109,7 @@
             draggable: hexagon.draggable,
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-regular-polygon>
         <v-arc
           v-for="arc in arcs"
@@ -124,6 +129,7 @@
             stroke: '#000',
             fillEnable: false,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-arc>
         <v-line
           v-for="line in lines"
@@ -141,6 +147,7 @@
             scaleY: line.scaleY,
             draggable: line.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-line>
         <v-text
           v-for="text in texts"
@@ -161,7 +168,58 @@
             scaleY: text.scaleY,
             draggable: text.draggable,
           }"
+          @dragend="handleShapeDragEnd"
         ></v-text>
+        <v-image
+          v-for="image in images"
+          :key="image.name"
+          :config="{
+            x: image.x,
+            y: image.y,
+            image: image.imageEl,
+            width: image.width,
+            height: image.height,
+            name: image.name,
+            scaleX: image.scaleX,
+            scaleY: image.scaleY,
+            draggable: image.draggable,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-image>
+        <v-line
+          v-for="bezier in beziers"
+          :key="bezier.name"
+          :config="{
+            points: bezier.points,
+            stroke: bezier.stroke || '#000',
+            strokeWidth: bezier.strokeWidth || 2,
+            lineCap: 'round',
+            lineJoin: 'round',
+            name: bezier.name,
+            scaleX: bezier.scaleX,
+            scaleY: bezier.scaleY,
+            draggable: bezier.draggable,
+            bezier: true,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-line>
+        <v-line
+          v-for="path in paths"
+          :key="path.name"
+          :config="{
+            points: path.points,
+            stroke: path.stroke || '#000',
+            strokeWidth: path.strokeWidth || 2,
+            lineCap: 'round',
+            lineJoin: 'round',
+            closed: true,
+            name: path.name,
+            scaleX: path.scaleX,
+            scaleY: path.scaleY,
+            draggable: path.draggable,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-line>
         <v-rect
           :config="{
             ...this.rectBox,
@@ -225,6 +283,18 @@ export default {
       default: () => []
     },
     texts: {
+      type: Array,
+      default: () => []
+    },
+    images: {
+      type: Array,
+      default: () => []
+    },
+    beziers: {
+      type: Array,
+      default: () => []
+    },
+    paths: {
       type: Array,
       default: () => []
     },
@@ -310,7 +380,7 @@ export default {
           transformerNode.getLayer().batchDraw()
         })
         const shapes = this.$refs.stage.getNode().find(node => {
-          if (node.getClassName() === 'Ellipse' || node.id() === 'rect' || node.getClassName() === 'RegularPolygon' || node.getClassName() === 'Arc' || node.getClassName() === 'Line' || node.getClassName() === 'Text') return true
+          if (node.getClassName() === 'Ellipse' || node.id() === 'rect' || node.getClassName() === 'RegularPolygon' || node.getClassName() === 'Arc' || node.getClassName() === 'Line' || node.getClassName() === 'Text' || node.getClassName() === 'Image') return true
         }).toArray()
         const box = this.$refs.rectBox.getNode().getClientRect()
         const selected = shapes.filter((shape) =>
@@ -341,7 +411,7 @@ export default {
           transformerNode.getLayer().draw()
           return
         }
-        if (e.target.id() === 'rect' || e.target.getClassName() === 'Ellipse' || e.target.getClassName() === 'RegularPolygon' || e.target.getClassName() === 'Arc' || e.target.getClassName() === 'Line' || e.target.getClassName() === 'Text') {
+        if (e.target.id() === 'rect' || e.target.getClassName() === 'Ellipse' || e.target.getClassName() === 'RegularPolygon' || e.target.getClassName() === 'Arc' || e.target.getClassName() === 'Line' || e.target.getClassName() === 'Text' || e.target.getClassName() === 'Image') {
           const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey
           const isSelected = transformerNode.nodes().indexOf(e.target) >= 0
           if (!metaPressed && !isSelected) {
@@ -418,7 +488,7 @@ export default {
       const stage = this.$refs.stage.getNode()
       let vertical = [0, stage.width() / 2, stage.width()]
       let horizontal = [0, stage.height() / 2, stage.height()]
-      stage.find('Rect, Ellipse, RegularPolygon, Line, Arc, Text').forEach((guideItem) => {
+      stage.find('Rect, Ellipse, RegularPolygon, Line, Arc, Text, Image').forEach((guideItem) => {
         if (guideItem === skipShape) {
           return
         }
@@ -471,6 +541,40 @@ export default {
           },
         ],
       }
+    },
+    // 边界检测
+    checkBounds(node) {
+      const stage = this.$refs.stage.getNode()
+      const box = node.getClientRect()
+      const pos = node.position()
+      
+      // 计算实际位置
+      let newX = pos.x
+      let newY = pos.y
+      
+      // 左边界
+      if (box.x < 0) {
+        newX = newX - box.x
+      }
+      // 上边界
+      if (box.y < 0) {
+        newY = newY - box.y
+      }
+      // 右边界
+      if (box.x + box.width > stage.width()) {
+        newX = stage.width() - box.width - (box.x - pos.x)
+      }
+      // 下边界
+      if (box.y + box.height > stage.height()) {
+        newY = stage.height() - box.height - (box.y - pos.y)
+      }
+      
+      // 如果位置有变化，更新节点位置
+      if (newX !== pos.x || newY !== pos.y) {
+        node.position({ x: newX, y: newY })
+        return true
+      }
+      return false
     },
     getGuides(lineGuideStops, itemBounds) {
       let resultV = []
@@ -563,6 +667,17 @@ export default {
       const layer = this.$refs.layer.getNode()
       layer.find('.guid-line').destroy()
       layer.batchDraw()
+    },
+    // 图形拖动结束处理
+    handleShapeDragEnd(e) {
+      const node = e.target
+      const boundsChanged = this.checkBounds(node)
+      if (boundsChanged) {
+        // 如果位置发生了变化，重新绘制
+        node.getLayer().batchDraw()
+        // 触发更新事件，通知父组件保存历史
+        this.$emit('shape-moved', node)
+      }
     },
     getStage() {
       return this.$refs.stage.getNode()

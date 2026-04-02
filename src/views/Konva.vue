@@ -19,6 +19,7 @@
         <tool-bar
           :arrowType="arrowType"
           @change-arrow-type="changeArrowType"
+          @import-image="handleImportImage"
         />
         <canvas
           :arrowType="arrowType"
@@ -30,6 +31,9 @@
           :arcs="arcs"
           :lines="lines"
           :texts="texts"
+          :images="images"
+          :beziers="beziers"
+          :paths="paths"
           :selectedShapeName="selectedShapeName"
           :attr="attr"
           @draw-start="handleDrawStart"
@@ -37,6 +41,7 @@
           @draw-end="handleDrawEnd"
           @select-shape="handleSelectShape"
           @edit-text="handleEditText"
+          @shape-moved="handleShapeMoved"
           ref="canvas"
         />
         <property-panel
@@ -95,6 +100,9 @@ export default {
       arcs: [],
       lines: [],
       texts: [],
+      images: [],
+      beziers: [],
+      paths: [],
       selectedShapeName: '',
       // 撤销/重做历史
       history: [],
@@ -150,6 +158,15 @@ export default {
               case 'text':
                 this.texts = this.texts.filter(r => r.name !== name)
                 break
+              case 'image':
+                this.images = this.images.filter(r => r.name !== name)
+                break
+              case 'bezier':
+                this.beziers = this.beziers.filter(r => r.name !== name)
+                break
+              case 'path':
+                this.paths = this.paths.filter(r => r.name !== name)
+                break
               default:
                 return
             }
@@ -201,6 +218,28 @@ export default {
           break
         case 'text':
           this.texts = drawByDown(pos, this.texts, 'text')
+          break
+        case 'bezier':
+          this.beziers.push({
+            points: [pos.x, pos.y, pos.x, pos.y, pos.x, pos.y],
+            name: 'bezier-' + Date.now(),
+            stroke: '#000',
+            strokeWidth: 2,
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          })
+          break
+        case 'path':
+          this.paths.push({
+            points: [pos.x, pos.y],
+            name: 'path-' + Date.now(),
+            stroke: '#000',
+            strokeWidth: 2,
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          })
           break
         default:
           return
@@ -268,9 +307,33 @@ export default {
           x: node.width() / 2,
           y: node.height() / 2
         }
+      } else if (type === 'bezier') {
+        let currentBezier = this.beziers[this.beziers.length - 1]
+        const startX = currentBezier.points[0]
+        const startY = currentBezier.points[1]
+        currentBezier.points = [
+          startX,
+          startY,
+          (startX + pos.x) / 2 - 50,
+          (startY + pos.y) / 2 - 50,
+          pos.x,
+          pos.y
+        ]
+      } else if (type === 'path') {
+        let currentPath = this.paths[this.paths.length - 1]
+        // 添加新的点到路径
+        currentPath.points = currentPath.points.concat([pos.x, pos.y])
       }
     },
     handleDrawEnd() {
+      // 闭合路径
+      if (this.arrowType === 'path' && this.paths.length > 0) {
+        let currentPath = this.paths[this.paths.length - 1]
+        if (currentPath.points.length >= 4) {
+          // 闭合路径，添加起点到终点
+          currentPath.points.push(currentPath.points[0], currentPath.points[1])
+        }
+      }
       this.saveHistory()
     },
     handleSelectShape(name, newAttr) {
@@ -364,7 +427,20 @@ export default {
         hexagons: JSON.parse(JSON.stringify(this.hexagons)),
         arcs: JSON.parse(JSON.stringify(this.arcs)),
         lines: JSON.parse(JSON.stringify(this.lines)),
-        texts: JSON.parse(JSON.stringify(this.texts))
+        texts: JSON.parse(JSON.stringify(this.texts)),
+        beziers: JSON.parse(JSON.stringify(this.beziers)),
+        paths: JSON.parse(JSON.stringify(this.paths)),
+        images: JSON.parse(JSON.stringify(this.images.map(img => ({
+          x: img.x,
+          y: img.y,
+          width: img.width,
+          height: img.height,
+          name: img.name,
+          scaleX: img.scaleX,
+          scaleY: img.scaleY,
+          draggable: img.draggable,
+          src: img.src
+        }))))
       }
       
       this.history = this.history.slice(0, this.historyIndex + 1)
@@ -399,6 +475,16 @@ export default {
       this.arcs = snapshot.arcs
       this.lines = snapshot.lines
       this.texts = snapshot.texts
+      this.beziers = snapshot.beziers || []
+      this.paths = snapshot.paths || []
+      
+      // 恢复图片需要重新加载
+      this.images = []
+      if (snapshot.images && snapshot.images.length > 0) {
+        snapshot.images.forEach(imgData => {
+          this.loadImageFromSrc(imgData.src, imgData)
+        })
+      }
       
       this.$refs.canvas.getTransformer().nodes([])
       this.selectedShapeName = ''
@@ -406,6 +492,63 @@ export default {
       if (this.$refs.canvas) {
         this.$refs.canvas.getTransformer().getLayer().batchDraw()
       }
+    },
+    // 处理图形移动事件（边界检测后）
+    handleShapeMoved(node) {
+      // 保存历史记录
+      this.saveHistory()
+    },
+    // 处理图片导入
+    handleImportImage(file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          // 计算图片尺寸，限制最大宽高
+          const maxWidth = 400
+          const maxHeight = 400
+          let width = img.width
+          let height = img.height
+          
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height)
+            width = width * ratio
+            height = height * ratio
+          }
+          
+          // 创建图片对象
+          const imageData = {
+            imageEl: img,
+            src: e.target.result,
+            x: 100,
+            y: 100,
+            width: width,
+            height: height,
+            name: 'image-' + Date.now(),
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          }
+          
+          // 保存历史并添加图片
+          this.images.push(imageData)
+          this.saveHistory()
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    },
+    // 从 src 加载图片（用于撤销/重做）
+    loadImageFromSrc(src, imgData) {
+      const img = new Image()
+      img.onload = () => {
+        const imageData = {
+          ...imgData,
+          imageEl: img
+        }
+        this.images.push(imageData)
+      }
+      img.src = src
     },
 
   },
