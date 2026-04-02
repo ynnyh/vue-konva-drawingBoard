@@ -198,9 +198,11 @@ export default {
       e.preventDefault()
     },
     changeArrowType (type) {
+      console.log('[Konva] changeArrowType called, type:', type)
       this.arrowType = type
     },
     handleDrawStart(pos, type) {
+      console.log('[Konva] handleDrawStart called, pos:', pos, 'type:', type)
       switch (type) {
         case 'rect':
           this.rects = drawByDown(pos, this.rects, 'rect')

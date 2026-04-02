@@ -326,10 +326,17 @@ export default {
       },
     }
   },
+  watch: {
+    arrowType(newVal) {
+      console.log('[Canvas] arrowType changed:', newVal)
+    }
+  },
   mounted() {
+    console.log('[Canvas] mounted, arrowType:', this.arrowType)
     window.addEventListener('resize', this.handleResize)
     this.$nextTick(() => {
       this.updateCanvasSize()
+      console.log('[Canvas] initial size:', this.configKonva.width, 'x', this.configKonva.height)
     })
   },
   beforeDestroy() {
@@ -344,11 +351,20 @@ export default {
       if (this.$refs.container) {
         this.configKonva.width = this.$refs.container.clientWidth
         this.configKonva.height = this.$refs.container.clientHeight || window.innerHeight
+        console.log('[Canvas] size updated:', this.configKonva.width, 'x', this.configKonva.height)
       }
     },
     handleMouseDown(e) {
+      console.log('[Canvas] handleMouseDown triggered, arrowType:', this.arrowType)
+      console.log('[Canvas] e.target:', e.target)
+      console.log('[Canvas] e.target.getStage():', e.target.getStage ? e.target.getStage() : 'no getStage')
+      
       if (this.arrowType === 'arrow') {
-        if (e.target !== e.target.getStage()) return
+        console.log('[Canvas] arrow mode - selecting')
+        if (e.target !== e.target.getStage()) {
+          console.log('[Canvas] clicked on shape, not stage, returning')
+          return
+        }
         this.down = true
         this.isDrawing = true
         if (e.target === e.target.getStage()) {
@@ -369,9 +385,11 @@ export default {
           return
         }
       } else {
+        console.log('[Canvas] drawing mode - starting draw for:', this.arrowType)
         this.down = true
         this.isDrawing = true
         const pos = this.$refs.stage.getNode().getPointerPosition()
+        console.log('[Canvas] emitting draw-start, pos:', pos, 'type:', this.arrowType)
         this.$emit('draw-start', pos, this.arrowType)
       }
     },
@@ -395,6 +413,7 @@ export default {
       }
     },
     handleMouseUp() {
+      console.log('[Canvas] handleMouseUp, isDrawing:', this.isDrawing, 'arrowType:', this.arrowType)
       this.isDrawing = false
       this.down = false
       if (this.arrowType === 'arrow') {
@@ -422,6 +441,7 @@ export default {
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
       } else {
+        console.log('[Canvas] emitting draw-end')
         this.$emit('draw-end')
       }
     },
