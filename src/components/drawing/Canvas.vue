@@ -203,6 +203,23 @@
           }"
           @dragend="handleShapeDragEnd"
         ></v-line>
+        <v-line
+          v-for="path in paths"
+          :key="path.name"
+          :config="{
+            points: path.points,
+            stroke: path.stroke || '#000',
+            strokeWidth: path.strokeWidth || 2,
+            lineCap: 'round',
+            lineJoin: 'round',
+            closed: true,
+            name: path.name,
+            scaleX: path.scaleX,
+            scaleY: path.scaleY,
+            draggable: path.draggable,
+          }"
+          @dragend="handleShapeDragEnd"
+        ></v-line>
         <v-rect
           :config="{
             ...this.rectBox,
@@ -274,6 +291,10 @@ export default {
       default: () => []
     },
     beziers: {
+      type: Array,
+      default: () => []
+    },
+    paths: {
       type: Array,
       default: () => []
     },

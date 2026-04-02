@@ -228,6 +228,26 @@
           </svg>
         </el-tooltip>
       </el-col>
+      <el-col :span="24">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="路径绘制"
+          placement="right"
+        >
+          <svg
+            class="icon"
+            aria-hidden="true"
+            style="font-size: 36px; cursor: pointer"
+            v-bind:style="{
+              color: arrowType === 'path' ? '#f20' : '',
+            }"
+            @click="changeArrowType('path')"
+          >
+            <use xlink:href="#icon-path"></use>
+          </svg>
+        </el-tooltip>
+      </el-col>
     </el-row>
   </el-aside>
 </template>

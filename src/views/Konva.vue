@@ -33,6 +33,7 @@
           :texts="texts"
           :images="images"
           :beziers="beziers"
+          :paths="paths"
           :selectedShapeName="selectedShapeName"
           :attr="attr"
           @draw-start="handleDrawStart"
@@ -101,6 +102,7 @@ export default {
       texts: [],
       images: [],
       beziers: [],
+      paths: [],
       selectedShapeName: '',
       // 撤销/重做历史
       history: [],
@@ -162,6 +164,9 @@ export default {
               case 'bezier':
                 this.beziers = this.beziers.filter(r => r.name !== name)
                 break
+              case 'path':
+                this.paths = this.paths.filter(r => r.name !== name)
+                break
               default:
                 return
             }
@@ -218,6 +223,17 @@ export default {
           this.beziers.push({
             points: [pos.x, pos.y, pos.x, pos.y, pos.x, pos.y],
             name: 'bezier-' + Date.now(),
+            stroke: '#000',
+            strokeWidth: 2,
+            scaleX: 1,
+            scaleY: 1,
+            draggable: true
+          })
+          break
+        case 'path':
+          this.paths.push({
+            points: [pos.x, pos.y],
+            name: 'path-' + Date.now(),
             stroke: '#000',
             strokeWidth: 2,
             scaleX: 1,
@@ -303,9 +319,21 @@ export default {
           pos.x,
           pos.y
         ]
+      } else if (type === 'path') {
+        let currentPath = this.paths[this.paths.length - 1]
+        // 添加新的点到路径
+        currentPath.points = currentPath.points.concat([pos.x, pos.y])
       }
     },
     handleDrawEnd() {
+      // 闭合路径
+      if (this.arrowType === 'path' && this.paths.length > 0) {
+        let currentPath = this.paths[this.paths.length - 1]
+        if (currentPath.points.length >= 4) {
+          // 闭合路径，添加起点到终点
+          currentPath.points.push(currentPath.points[0], currentPath.points[1])
+        }
+      }
       this.saveHistory()
     },
     handleSelectShape(name, newAttr) {
@@ -401,6 +429,7 @@ export default {
         lines: JSON.parse(JSON.stringify(this.lines)),
         texts: JSON.parse(JSON.stringify(this.texts)),
         beziers: JSON.parse(JSON.stringify(this.beziers)),
+        paths: JSON.parse(JSON.stringify(this.paths)),
         images: JSON.parse(JSON.stringify(this.images.map(img => ({
           x: img.x,
           y: img.y,
@@ -447,6 +476,7 @@ export default {
       this.lines = snapshot.lines
       this.texts = snapshot.texts
       this.beziers = snapshot.beziers || []
+      this.paths = snapshot.paths || []
       
       // 恢复图片需要重新加载
       this.images = []
