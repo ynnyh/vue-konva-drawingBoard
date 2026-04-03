@@ -1,287 +1,264 @@
 <template>
-  <div class="leftPart">
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="箭头"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'arrow' ? '#f20' : '',
-          }"
-          @click="changeArrowType('arrow')"
-        >
-          <use xlink:href="#icon-arrow"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="三角形"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'triangle' ? '#f20' : '',
-          }"
-          @click="changeArrowType('triangle')"
-        >
-          <use xlink:href="#icon-triangle"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="四边形"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'rect' ? '#f20' : '',
-          }"
-          @click="changeArrowType('rect')"
-        >
-          <use xlink:href="#icon-rect"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="五边形"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'pentagon' ? '#f20' : '',
-          }"
-          @click="changeArrowType('pentagon')"
-        >
-          <use xlink:href="#icon-pentagon"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="六边形"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'hexagon' ? '#f20' : '',
-          }"
-          @click="changeArrowType('hexagon')"
-        >
-          <use xlink:href="#icon-hexagon"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="椭圆"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'circle' ? '#f20' : '',
-          }"
-          @click="changeArrowType('circle')"
-        >
-          <use xlink:href="#icon-circle"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="弧形"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'arc' ? '#f20' : '',
-          }"
-          @click="changeArrowType('arc')"
-        >
-          <use xlink:href="#icon-arc"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="铅笔"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'line' ? '#f20' : '',
-          }"
-          @click="changeArrowType('line')"
-        >
-          <use xlink:href="#icon-pencil"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="文字"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'text' ? '#f20' : '',
-          }"
-          @click="changeArrowType('text')"
-        >
-          <use xlink:href="#icon-text"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="导入图片"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'image' ? '#f20' : '',
-          }"
-          @click="triggerImageUpload"
-        >
-          <use xlink:href="#icon-image"></use>
-        </svg>
-      </el-tooltip>
-      <input
-        ref="imageInput"
-        type="file"
-        accept="image/*"
-        style="display: none"
-        @change="handleImageSelect"
-      />
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="贝塞尔曲线"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'bezier' ? '#f20' : '',
-          }"
-          @click="changeArrowType('bezier')"
-        >
-          <use xlink:href="#icon-bezier"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="路径绘制"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          v-bind:style="{
-            color: arrowType === 'path' ? '#f20' : '',
-          }"
-          @click="changeArrowType('path')"
-        >
-          <use xlink:href="#icon-path"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="组合"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          @click="handleGroup"
-        >
-          <use xlink:href="#icon-group"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-    <div class="tool-row">
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="取消组合"
-        placement="right"
-      >
-        <svg
-          class="icon"
-          aria-hidden="true"
-          style="font-size: 36px; cursor: pointer"
-          @click="handleUngroup"
-        >
-          <use xlink:href="#icon-ungroup"></use>
-        </svg>
-      </el-tooltip>
-    </div>
-  </div>
+  <el-aside width="60px" class="leftPart">
+    <el-scrollbar style="height: 100%">
+      <el-row :gutter="10" class="tool-bar-container">
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="选择工具"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'arrow' }"
+              @click="changeArrowType('arrow')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-arrow"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="三角形"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'triangle' }"
+              @click="changeArrowType('triangle')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-triangle"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="矩形"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'rect' }"
+              @click="changeArrowType('rect')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-rect"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="五边形"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'pentagon' }"
+              @click="changeArrowType('pentagon')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-pentagon"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="六边形"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'hexagon' }"
+              @click="changeArrowType('hexagon')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-hexagon"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="椭圆"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'circle' }"
+              @click="changeArrowType('circle')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-circle"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="弧形"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'arc' }"
+              @click="changeArrowType('arc')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-arc"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="自由线条"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'line' }"
+              @click="changeArrowType('line')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-pencil"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="文字"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'text' }"
+              @click="changeArrowType('text')"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-text"></use>
+              </svg>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="导入图片"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'image' }"
+              @click="triggerImageUpload"
+            >
+              <span class="icon-emoji">🖼️</span>
+            </div>
+          </el-tooltip>
+          <input
+            ref="imageInput"
+            type="file"
+            accept="image/*"
+            style="display: none"
+            @change="handleImageSelect"
+          />
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="贝塞尔曲线"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'bezier' }"
+              @click="changeArrowType('bezier')"
+            >
+              <span class="icon-emoji">〰️</span>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="路径绘制"
+            placement="right"
+          >
+            <div
+              class="tool-icon"
+              :class="{ active: arrowType === 'path' }"
+              @click="changeArrowType('path')"
+            >
+              <span class="icon-emoji">✏️</span>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="组合"
+            placement="right"
+          >
+            <div class="tool-icon" @click="handleGroup">
+              <span class="icon-emoji">📦</span>
+            </div>
+          </el-tooltip>
+        </el-col>
+        
+        <el-col :span="24" class="tool-item">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="取消组合"
+            placement="right"
+          >
+            <div class="tool-icon" @click="handleUngroup">
+              <span class="icon-emoji">📤</span>
+            </div>
+          </el-tooltip>
+        </el-col>
+      </el-row>
+    </el-scrollbar>
+  </el-aside>
 </template>
 
 <script>
@@ -304,7 +281,6 @@ export default {
       const file = e.target.files[0]
       if (file) {
         this.$emit('import-image', file)
-        // 清空 input，允许重复选择同一文件
         e.target.value = ''
       }
     },
@@ -320,25 +296,66 @@ export default {
 
 <style lang="less" scoped>
 .leftPart {
-  width: 60px;
-  min-width: 60px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   height: 100%;
-  background: #f5f5f5;
-  padding: 10px 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-}
-
-.tool-row {
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.icon {
-  transition: color 0.3s ease;
+  padding: 20px 0;
+  box-sizing: border-box;
+  
+  :deep(.el-scrollbar__wrap) {
+    overflow-x: hidden;
+  }
+  
+  .tool-bar-container {
+    padding: 0 10px;
+  }
+  
+  .tool-item {
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .tool-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin: 0 auto;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      background: #f0f4f8;
+    }
+    
+    &.active {
+      background: #409EFF;
+      color: white;
+      box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
+      
+      .icon, .icon-emoji {
+        color: white !important;
+      }
+    }
+    
+    .icon {
+      font-size: 24px;
+      color: #444;
+      transition: color 0.3s ease;
+    }
+    
+    .icon-emoji {
+      font-size: 20px;
+      line-height: 1;
+    }
+  }
 }
 </style>

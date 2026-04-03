@@ -14,7 +14,7 @@
       @keydown="handleTextKeyDown"
       @blur="handleTextBlur"
     ></textarea>
-    <div class="main-container">
+    <el-container>
       <tool-bar
         :arrowType="arrowType"
         @change-arrow-type="changeArrowType"
@@ -22,30 +22,32 @@
         @group-shapes="handleGroup"
         @ungroup-shapes="handleUngroup"
       />
-      <Canvas
-        :arrowType="arrowType"
-        :rects="rects"
-        :circles="circles"
-        :triangles="triangles"
-        :pentagons="pentagons"
-        :hexagons="hexagons"
-        :arcs="arcs"
-        :lines="lines"
-        :texts="texts"
-        :images="images"
-        :beziers="beziers"
-        :paths="paths"
-        :selectedShapeName="selectedShapeName"
-        :attr="attr"
-        @draw-start="handleDrawStart"
-        @draw-move="handleDrawMove"
-        @draw-end="handleDrawEnd"
-        @select-shape="handleSelectShape"
-        @edit-text="handleEditText"
-        @shape-moved="handleShapeMoved"
-        ref="canvas"
-      />
-      <PropertyPanel
+      <el-main style="padding: 0; overflow: hidden;">
+        <canvas
+          :arrowType="arrowType"
+          :rects="rects"
+          :circles="circles"
+          :triangles="triangles"
+          :pentagons="pentagons"
+          :hexagons="hexagons"
+          :arcs="arcs"
+          :lines="lines"
+          :texts="texts"
+          :images="images"
+          :beziers="beziers"
+          :paths="paths"
+          :selectedShapeName="selectedShapeName"
+          :attr="attr"
+          @draw-start="handleDrawStart"
+          @draw-move="handleDrawMove"
+          @draw-end="handleDrawEnd"
+          @select-shape="handleSelectShape"
+          @edit-text="handleEditText"
+          @shape-moved="handleShapeMoved"
+          ref="canvas"
+        />
+      </el-main>
+      <property-panel
         :selectedShapeName="selectedShapeName"
         :attr="attr"
         @change="handlePropertyChange"
@@ -55,7 +57,7 @@
         @move-down="moveDown"
         @move-to-bottom="moveToBottom"
       />
-    </div>
+    </el-container>
   </div>
 </template>
 
@@ -196,11 +198,11 @@ export default {
       e.preventDefault()
     },
     changeArrowType (type) {
-      console.log('Konva: changeArrowType called, type:', type)
+      console.log('[Konva] changeArrowType called, type:', type)
       this.arrowType = type
     },
     handleDrawStart(pos, type) {
-      console.log('Konva: handleDrawStart called', { pos, type })
+      console.log('[Konva] handleDrawStart called, pos:', pos, 'type:', type)
       switch (type) {
         case 'rect':
           this.rects = drawByDown(pos, this.rects, 'rect')
@@ -698,15 +700,13 @@ export default {
 <style lang="less" scoped>
 .root {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
 }
 
-.main-container {
-  display: flex;
-  flex: 1;
-  width: 100%;
+:deep(.el-container) {
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 </style>

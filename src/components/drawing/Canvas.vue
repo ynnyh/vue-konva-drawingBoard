@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-container">
+  <div class="canvas-container" ref="container">
     <v-stage
       ref="stage"
       :config="configKonva"
@@ -314,8 +314,8 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: 0,
-        height: 0
+        width: 800,
+        height: 600
       },
       rectBox: {
         visible: false,
@@ -326,33 +326,47 @@ export default {
       },
     }
   },
+  watch: {
+    arrowType(newVal) {
+      console.log('[Canvas] arrowType changed:', newVal)
+    }
+  },
   mounted() {
-    this.initCanvasSize()
+    console.log('[Canvas] mounted, arrowType:', this.arrowType)
     window.addEventListener('resize', this.handleResize)
+    this.$nextTick(() => {
+      this.updateCanvasSize()
+      console.log('[Canvas] initial size:', this.configKonva.width, 'x', this.configKonva.height)
+    })
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    initCanvasSize() {
-      const container = this.$el
-      if (container) {
-        this.configKonva = {
-          width: container.clientWidth,
-          height: container.clientHeight
-        }
-        console.log('Canvas: initialized size', { width: container.clientWidth, height: container.clientHeight })
+    handleResize() {
+      this.updateCanvasSize()
+      this.$forceUpdate()
+    },
+    updateCanvasSize() {
+      if (this.$refs.container) {
+        this.configKonva.width = this.$refs.container.clientWidth
+        this.configKonva.height = this.$refs.container.clientHeight || window.innerHeight
+        console.log('[Canvas] size updated:', this.configKonva.width, 'x', this.configKonva.height)
       }
     },
-    handleResize() {
-      this.initCanvasSize()
-    },
     handleMouseDown(e) {
-      console.log('Canvas: handleMouseDown called', { target: e.target, arrowType: this.arrowType })
-      if (e.target !== e.target.getStage()) return
-      this.down = true
-      this.isDrawing = true
+      console.log('[Canvas] handleMouseDown triggered, arrowType:', this.arrowType)
+      console.log('[Canvas] e.target:', e.target)
+      console.log('[Canvas] e.target.getStage():', e.target.getStage ? e.target.getStage() : 'no getStage')
+      
       if (this.arrowType === 'arrow') {
+        console.log('[Canvas] arrow mode - selecting')
+        if (e.target !== e.target.getStage()) {
+          console.log('[Canvas] clicked on shape, not stage, returning')
+          return
+        }
+        this.down = true
+        this.isDrawing = true
         if (e.target === e.target.getStage()) {
           x1 = this.$refs.stage.getNode().getPointerPosition().x
           y1 = this.$refs.stage.getNode().getPointerPosition().y
@@ -370,10 +384,14 @@ export default {
           transformerNode.getLayer().draw()
           return
         }
+      } else {
+        console.log('[Canvas] drawing mode - starting draw for:', this.arrowType)
+        this.down = true
+        this.isDrawing = true
+        const pos = this.$refs.stage.getNode().getPointerPosition()
+        console.log('[Canvas] emitting draw-start, pos:', pos, 'type:', this.arrowType)
+        this.$emit('draw-start', pos, this.arrowType)
       }
-      const pos = this.$refs.stage.getNode().getPointerPosition()
-      console.log('Canvas: emitting draw-start', { pos, arrowType: this.arrowType })
-      this.$emit('draw-start', pos, this.arrowType)
     },
     handleMouseMove(e) {
       console.log('Canvas: handleMouseMove called', { isDrawing: this.isDrawing, arrowType: this.arrowType })
@@ -397,7 +415,7 @@ export default {
       }
     },
     handleMouseUp() {
-      console.log('Canvas: handleMouseUp called', { arrowType: this.arrowType })
+      console.log('[Canvas] handleMouseUp, isDrawing:', this.isDrawing, 'arrowType:', this.arrowType)
       this.isDrawing = false
       this.down = false
       if (this.arrowType === 'arrow') {
@@ -425,7 +443,7 @@ export default {
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
       } else {
-        console.log('Canvas: emitting draw-end')
+        console.log('[Canvas] emitting draw-end')
         this.$emit('draw-end')
       }
     },
@@ -570,34 +588,27 @@ export default {
         ],
       }
     },
-    // 边界检测
     checkBounds(node) {
       const stage = this.$refs.stage.getNode()
       const box = node.getClientRect()
       const pos = node.position()
       
-      // 计算实际位置
       let newX = pos.x
       let newY = pos.y
       
-      // 左边界
       if (box.x < 0) {
         newX = newX - box.x
       }
-      // 上边界
       if (box.y < 0) {
         newY = newY - box.y
       }
-      // 右边界
       if (box.x + box.width > stage.width()) {
         newX = stage.width() - box.width - (box.x - pos.x)
       }
-      // 下边界
       if (box.y + box.height > stage.height()) {
         newY = stage.height() - box.height - (box.y - pos.y)
       }
       
-      // 如果位置有变化，更新节点位置
       if (newX !== pos.x || newY !== pos.y) {
         node.position({ x: newX, y: newY })
         return true
@@ -696,14 +707,11 @@ export default {
       layer.find('.guid-line').destroy()
       layer.batchDraw()
     },
-    // 图形拖动结束处理
     handleShapeDragEnd(e) {
       const node = e.target
       const boundsChanged = this.checkBounds(node)
       if (boundsChanged) {
-        // 如果位置发生了变化，重新绘制
         node.getLayer().batchDraw()
-        // 触发更新事件，通知父组件保存历史
         this.$emit('shape-moved', node)
       }
     },
@@ -719,9 +727,8 @@ export default {
 
 <style lang="less" scoped>
 .canvas-container {
-  flex: 1;
+  width: 100%;
   height: 100%;
-  overflow: hidden;
-  background: white;
+  background: #fff;
 }
 </style>
