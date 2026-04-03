@@ -14,45 +14,38 @@
       @keydown="handleTextKeyDown"
       @blur="handleTextBlur"
     ></textarea>
-<<<<<<< HEAD
-    <el-container>
-      <tool-bar
-=======
     <div class="main-container">
       <ToolBar
->>>>>>> 8bcc689 (feat: 生成项目Code Wiki文档)
         :arrowType="arrowType"
         @change-arrow-type="changeArrowType"
         @import-image="handleImportImage"
         @group-shapes="handleGroup"
         @ungroup-shapes="handleUngroup"
       />
-      <el-main style="padding: 0; overflow: hidden;">
-        <canvas
-          :arrowType="arrowType"
-          :rects="rects"
-          :circles="circles"
-          :triangles="triangles"
-          :pentagons="pentagons"
-          :hexagons="hexagons"
-          :arcs="arcs"
-          :lines="lines"
-          :texts="texts"
-          :images="images"
-          :beziers="beziers"
-          :paths="paths"
-          :selectedShapeName="selectedShapeName"
-          :attr="attr"
-          @draw-start="handleDrawStart"
-          @draw-move="handleDrawMove"
-          @draw-end="handleDrawEnd"
-          @select-shape="handleSelectShape"
-          @edit-text="handleEditText"
-          @shape-moved="handleShapeMoved"
-          ref="canvas"
-        />
-      </el-main>
-      <property-panel
+      <Canvas
+        :arrowType="arrowType"
+        :rects="rects"
+        :circles="circles"
+        :triangles="triangles"
+        :pentagons="pentagons"
+        :hexagons="hexagons"
+        :arcs="arcs"
+        :lines="lines"
+        :texts="texts"
+        :images="images"
+        :beziers="beziers"
+        :paths="paths"
+        :selectedShapeName="selectedShapeName"
+        :attr="attr"
+        @draw-start="handleDrawStart"
+        @draw-move="handleDrawMove"
+        @draw-end="handleDrawEnd"
+        @select-shape="handleSelectShape"
+        @edit-text="handleEditText"
+        @shape-moved="handleShapeMoved"
+        ref="canvas"
+      />
+      <PropertyPanel
         :selectedShapeName="selectedShapeName"
         :attr="attr"
         @change="handlePropertyChange"
@@ -62,7 +55,7 @@
         @move-down="moveDown"
         @move-to-bottom="moveToBottom"
       />
-    </el-container>
+    </div>
   </div>
 </template>
 
@@ -705,13 +698,15 @@ export default {
 <style lang="less" scoped>
 .root {
   height: 100%;
-  width: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-:deep(.el-container) {
-  height: 100%;
+.main-container {
+  display: flex;
+  flex: 1;
   width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 </style>
