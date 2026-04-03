@@ -343,6 +343,7 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
+<<<<<<< HEAD
     handleResize() {
       this.updateCanvasSize()
       this.$forceUpdate()
@@ -352,6 +353,17 @@ export default {
         this.configKonva.width = this.$refs.container.clientWidth
         this.configKonva.height = this.$refs.container.clientHeight || window.innerHeight
         console.log('[Canvas] size updated:', this.configKonva.width, 'x', this.configKonva.height)
+=======
+    initCanvasSize() {
+      const container = this.$el
+      console.log('Canvas: initCanvasSize called', { container: !!container, clientWidth: container?.clientWidth, clientHeight: container?.clientHeight })
+      if (container) {
+        this.configKonva = {
+          width: container.clientWidth,
+          height: container.clientHeight
+        }
+        console.log('Canvas: initialized size', { width: container.clientWidth, height: container.clientHeight })
+>>>>>>> 8bcc689 (feat: 生成项目Code Wiki文档)
       }
     },
     handleMouseDown(e) {

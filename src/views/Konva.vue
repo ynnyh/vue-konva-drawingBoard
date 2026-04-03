@@ -14,8 +14,13 @@
       @keydown="handleTextKeyDown"
       @blur="handleTextBlur"
     ></textarea>
+<<<<<<< HEAD
     <el-container>
       <tool-bar
+=======
+    <div class="main-container">
+      <ToolBar
+>>>>>>> 8bcc689 (feat: 生成项目Code Wiki文档)
         :arrowType="arrowType"
         @change-arrow-type="changeArrowType"
         @import-image="handleImportImage"
