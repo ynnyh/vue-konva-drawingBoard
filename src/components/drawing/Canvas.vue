@@ -1,5 +1,5 @@
 <template>
-  <el-main>
+  <div class="canvas-container">
     <v-stage
       ref="stage"
       :config="configKonva"
@@ -234,15 +234,13 @@
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>
-  </el-main>
+  </div>
 </template>
 
 <script>
 import Konva from 'konva'
 import { delShape, drawByDown, setAttr } from '../../utils/utils'
 
-const kWidth = document.body.clientWidth * 0.8
-const kHeight = window.innerHeight
 let x1, y1, x2, y2
 let transformerNode = ''
 const GUIDELINE_OFFSET = 5
@@ -316,8 +314,8 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: kWidth,
-        height: kHeight
+        width: 0,
+        height: 0
       },
       rectBox: {
         visible: false,
@@ -328,7 +326,27 @@ export default {
       },
     }
   },
+  mounted() {
+    this.initCanvasSize()
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
+    initCanvasSize() {
+      const container = this.$el
+      if (container) {
+        this.configKonva = {
+          width: container.clientWidth,
+          height: container.clientHeight
+        }
+        console.log('Canvas: initialized size', { width: container.clientWidth, height: container.clientHeight })
+      }
+    },
+    handleResize() {
+      this.initCanvasSize()
+    },
     handleMouseDown(e) {
       console.log('Canvas: handleMouseDown called', { target: e.target, arrowType: this.arrowType })
       if (e.target !== e.target.getStage()) return
@@ -700,7 +718,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-main {
-  padding: 0 !important;
+.canvas-container {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  background: white;
 }
 </style>
