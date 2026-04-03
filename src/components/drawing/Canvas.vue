@@ -314,8 +314,8 @@ export default {
       isDrawing: false,
       down: false,
       configKonva: {
-        width: 800,
-        height: 600
+        width: 0,
+        height: 0
       },
       rectBox: {
         visible: false,
@@ -326,34 +326,14 @@ export default {
       },
     }
   },
-  watch: {
-    arrowType(newVal) {
-      console.log('[Canvas] arrowType changed:', newVal)
-    }
-  },
   mounted() {
-    console.log('[Canvas] mounted, arrowType:', this.arrowType)
+    this.initCanvasSize()
     window.addEventListener('resize', this.handleResize)
-    this.$nextTick(() => {
-      this.updateCanvasSize()
-      console.log('[Canvas] initial size:', this.configKonva.width, 'x', this.configKonva.height)
-    })
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-<<<<<<< HEAD
-    handleResize() {
-      this.updateCanvasSize()
-      this.$forceUpdate()
-    },
-    updateCanvasSize() {
-      if (this.$refs.container) {
-        this.configKonva.width = this.$refs.container.clientWidth
-        this.configKonva.height = this.$refs.container.clientHeight || window.innerHeight
-        console.log('[Canvas] size updated:', this.configKonva.width, 'x', this.configKonva.height)
-=======
     initCanvasSize() {
       const container = this.$el
       console.log('Canvas: initCanvasSize called', { container: !!container, clientWidth: container?.clientWidth, clientHeight: container?.clientHeight })
@@ -363,47 +343,42 @@ export default {
           height: container.clientHeight
         }
         console.log('Canvas: initialized size', { width: container.clientWidth, height: container.clientHeight })
->>>>>>> 8bcc689 (feat: 生成项目Code Wiki文档)
       }
     },
+    handleResize() {
+      this.initCanvasSize()
+    },
     handleMouseDown(e) {
-      console.log('[Canvas] handleMouseDown triggered, arrowType:', this.arrowType)
-      console.log('[Canvas] e.target:', e.target)
-      console.log('[Canvas] e.target.getStage():', e.target.getStage ? e.target.getStage() : 'no getStage')
+      console.log('Canvas: handleMouseDown called', { target: e.target?.className, arrowType: this.arrowType, isStage: e.target === e.target.getStage() })
       
       if (this.arrowType === 'arrow') {
-        console.log('[Canvas] arrow mode - selecting')
-        if (e.target !== e.target.getStage()) {
-          console.log('[Canvas] clicked on shape, not stage, returning')
-          return
-        }
-        this.down = true
-        this.isDrawing = true
-        if (e.target === e.target.getStage()) {
-          x1 = this.$refs.stage.getNode().getPointerPosition().x
-          y1 = this.$refs.stage.getNode().getPointerPosition().y
-          x2 = this.$refs.stage.getNode().getPointerPosition().x
-          y2 = this.$refs.stage.getNode().getPointerPosition().y
+        if (e.target !== e.target.getStage()) return
+        
+        x1 = this.$refs.stage.getNode().getPointerPosition().x
+        y1 = this.$refs.stage.getNode().getPointerPosition().y
+        x2 = this.$refs.stage.getNode().getPointerPosition().x
+        y2 = this.$refs.stage.getNode().getPointerPosition().y
 
-          this.rectBox = {
-            visible: true,
-            width: 0,
-            height: 0,
-            x: 0,
-            y: 0,
-          }
-          transformerNode = this.$refs.transformer.getNode()
-          transformerNode.getLayer().draw()
-          return
+        this.rectBox = {
+          visible: true,
+          width: 0,
+          height: 0,
+          x: 0,
+          y: 0,
         }
-      } else {
-        console.log('[Canvas] drawing mode - starting draw for:', this.arrowType)
+        transformerNode = this.$refs.transformer.getNode()
+        transformerNode.getLayer().draw()
         this.down = true
         this.isDrawing = true
-        const pos = this.$refs.stage.getNode().getPointerPosition()
-        console.log('[Canvas] emitting draw-start, pos:', pos, 'type:', this.arrowType)
-        this.$emit('draw-start', pos, this.arrowType)
+        return
       }
+      
+      this.down = true
+      this.isDrawing = true
+      
+      const pos = this.$refs.stage.getNode().getPointerPosition()
+      console.log('Canvas: emitting draw-start', { pos, arrowType: this.arrowType })
+      this.$emit('draw-start', pos, this.arrowType)
     },
     handleMouseMove(e) {
       console.log('Canvas: handleMouseMove called', { isDrawing: this.isDrawing, arrowType: this.arrowType })
@@ -427,7 +402,7 @@ export default {
       }
     },
     handleMouseUp() {
-      console.log('[Canvas] handleMouseUp, isDrawing:', this.isDrawing, 'arrowType:', this.arrowType)
+      console.log('Canvas: handleMouseUp called', { arrowType: this.arrowType })
       this.isDrawing = false
       this.down = false
       if (this.arrowType === 'arrow') {
@@ -455,7 +430,7 @@ export default {
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
       } else {
-        console.log('[Canvas] emitting draw-end')
+        console.log('Canvas: emitting draw-end')
         this.$emit('draw-end')
       }
     },
@@ -708,7 +683,7 @@ export default {
           layer.add(line)
           line.absolutePosition({
             x: lg.lineGuide,
-            y: 0,
+            y: 0
           })
           layer.batchDraw()
         }
@@ -739,8 +714,9 @@ export default {
 
 <style lang="less" scoped>
 .canvas-container {
-  width: 100%;
+  flex: 1;
   height: 100%;
-  background: #fff;
+  overflow: hidden;
+  background: white;
 }
 </style>
