@@ -330,6 +330,7 @@ export default {
   },
   methods: {
     handleMouseDown(e) {
+      console.log('Canvas: handleMouseDown called', { target: e.target, arrowType: this.arrowType })
       if (e.target !== e.target.getStage()) return
       this.down = true
       this.isDrawing = true
@@ -353,9 +354,11 @@ export default {
         }
       }
       const pos = this.$refs.stage.getNode().getPointerPosition()
+      console.log('Canvas: emitting draw-start', { pos, arrowType: this.arrowType })
       this.$emit('draw-start', pos, this.arrowType)
     },
     handleMouseMove(e) {
+      console.log('Canvas: handleMouseMove called', { isDrawing: this.isDrawing, arrowType: this.arrowType })
       if (!this.isDrawing) return
       if (this.arrowType === 'arrow') {
         if (!this.rectBox.visible) return
@@ -371,10 +374,12 @@ export default {
         transformerNode.getLayer().batchDraw()
       } else {
         const pos = this.$refs.stage.getNode().getPointerPosition()
+        console.log('Canvas: emitting draw-move', { pos, arrowType: this.arrowType })
         this.$emit('draw-move', pos, this.arrowType, e.evt.shiftKey)
       }
     },
     handleMouseUp() {
+      console.log('Canvas: handleMouseUp called', { arrowType: this.arrowType })
       this.isDrawing = false
       this.down = false
       if (this.arrowType === 'arrow') {
@@ -402,6 +407,7 @@ export default {
         transformerNode.nodes(selected)
         transformerNode.getLayer().batchDraw()
       } else {
+        console.log('Canvas: emitting draw-end')
         this.$emit('draw-end')
       }
     },

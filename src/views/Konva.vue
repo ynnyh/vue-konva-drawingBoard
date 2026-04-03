@@ -23,7 +23,7 @@
           @group-shapes="handleGroup"
           @ungroup-shapes="handleUngroup"
         />
-        <canvas
+        <Canvas
           :arrowType="arrowType"
           :rects="rects"
           :circles="circles"
@@ -46,7 +46,7 @@
           @shape-moved="handleShapeMoved"
           ref="canvas"
         />
-        <property-panel
+        <PropertyPanel
           :selectedShapeName="selectedShapeName"
           :attr="attr"
           @change="handlePropertyChange"
@@ -201,6 +201,7 @@ export default {
       this.arrowType = type
     },
     handleDrawStart(pos, type) {
+      console.log('Konva: handleDrawStart called', { pos, type })
       switch (type) {
         case 'rect':
           this.rects = drawByDown(pos, this.rects, 'rect')
@@ -253,6 +254,7 @@ export default {
       }
     },
     handleDrawMove(pos, type, shiftKey) {
+      console.log('Konva: handleDrawMove called', { pos, type, shiftKey })
       if (type === 'rect') {
         let currentRect = this.rects[this.rects.length - 1]
         if (shiftKey) {
@@ -333,6 +335,7 @@ export default {
       }
     },
     handleDrawEnd() {
+      console.log('Konva: handleDrawEnd called')
       // 闭合路径
       if (this.arrowType === 'path' && this.paths.length > 0) {
         let currentPath = this.paths[this.paths.length - 1]
