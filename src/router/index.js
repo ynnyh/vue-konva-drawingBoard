@@ -10,11 +10,6 @@ const routes = [
     component: () => import('../views/Konva.vue')
   },
   {
-    path: '/native',
-    name: 'native',
-    component: () => import('../views/NativeKonva.vue')
-  },
-  {
     path: '/infinite',
     name: 'infinite',
     component: () => import('../views/InfiniteCanvasView.vue')
