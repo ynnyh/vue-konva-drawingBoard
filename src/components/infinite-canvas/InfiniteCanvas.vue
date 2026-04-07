@@ -106,22 +106,29 @@ export default {
       ctx.lineWidth = 1
       
       // 计算网格的起始位置，确保网格能够跟随平移
-      const startX = - (Math.abs(this.translateX / this.scale) % gridSize)
-      const startY = - (Math.abs(this.translateY / this.scale) % gridSize)
+      const offsetX = this.translateX / this.scale
+      const offsetY = this.translateY / this.scale
+      const startX = Math.floor(offsetX / gridSize) * gridSize
+      const startY = Math.floor(offsetY / gridSize) * gridSize
       
-      // 绘制垂直线，扩展绘制范围以确保平移后仍能看到网格
-      for (let x = startX; x < width + gridSize; x += gridSize) {
+      // 扩展绘制范围，确保足够大的网格覆盖区域
+      const gridCount = 20 // 绘制更多网格，确保拖拽后仍能看到
+      const extendedWidth = width + gridSize * gridCount
+      const extendedHeight = height + gridSize * gridCount
+      
+      // 绘制垂直线
+      for (let x = startX - gridSize * gridCount; x < startX + extendedWidth; x += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(x, startY)
-        ctx.lineTo(x, height + gridSize)
+        ctx.moveTo(x, startY - gridSize * gridCount)
+        ctx.lineTo(x, startY + extendedHeight)
         ctx.stroke()
       }
       
-      // 绘制水平线，扩展绘制范围以确保平移后仍能看到网格
-      for (let y = startY; y < height + gridSize; y += gridSize) {
+      // 绘制水平线
+      for (let y = startY - gridSize * gridCount; y < startY + extendedHeight; y += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(startX, y)
-        ctx.lineTo(width + gridSize, y)
+        ctx.moveTo(startX - gridSize * gridCount, y)
+        ctx.lineTo(startX + extendedWidth, y)
         ctx.stroke()
       }
     },
