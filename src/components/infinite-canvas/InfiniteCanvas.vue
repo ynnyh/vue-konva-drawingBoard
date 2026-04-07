@@ -45,9 +45,14 @@ export default {
   mounted() {
     this.initCanvas()
     window.addEventListener('resize', this.handleResize)
+    // 全局监听键盘事件，确保空格键在任何地方都能触发
+    window.addEventListener('keydown', this.handleKeyDown)
+    window.addEventListener('keyup', this.handleKeyUp)
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('keydown', this.handleKeyDown)
+    window.removeEventListener('keyup', this.handleKeyUp)
   },
   methods: {
     initCanvas() {
@@ -100,19 +105,23 @@ export default {
       ctx.strokeStyle = '#e0e0e0'
       ctx.lineWidth = 1
       
-      // 绘制垂直线
-      for (let x = 0; x < width; x += gridSize) {
+      // 计算网格的起始位置，确保网格能够跟随平移
+      const startX = - (Math.abs(this.translateX / this.scale) % gridSize)
+      const startY = - (Math.abs(this.translateY / this.scale) % gridSize)
+      
+      // 绘制垂直线，扩展绘制范围以确保平移后仍能看到网格
+      for (let x = startX; x < width + gridSize; x += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, height)
+        ctx.moveTo(x, startY)
+        ctx.lineTo(x, height + gridSize)
         ctx.stroke()
       }
       
-      // 绘制水平线
-      for (let y = 0; y < height; y += gridSize) {
+      // 绘制水平线，扩展绘制范围以确保平移后仍能看到网格
+      for (let y = startY; y < height + gridSize; y += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(width, y)
+        ctx.moveTo(startX, y)
+        ctx.lineTo(width + gridSize, y)
         ctx.stroke()
       }
     },
