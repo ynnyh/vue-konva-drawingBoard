@@ -106,29 +106,25 @@ export default {
       ctx.lineWidth = 1
       
       // 计算网格的起始位置，确保网格能够跟随平移
-      const offsetX = this.translateX / this.scale
-      const offsetY = this.translateY / this.scale
-      const startX = Math.floor(offsetX / gridSize) * gridSize
-      const startY = Math.floor(offsetY / gridSize) * gridSize
-      
-      // 扩展绘制范围，确保足够大的网格覆盖区域
-      const gridCount = 20 // 绘制更多网格，确保拖拽后仍能看到
-      const extendedWidth = width + gridSize * gridCount
-      const extendedHeight = height + gridSize * gridCount
+      // 从负方向开始绘制，确保整个画布都有网格
+      const startX = -1000 // 向左绘制1000个单位
+      const startY = -1000 // 向上绘制1000个单位
+      const endX = width + 1000 // 向右绘制到画布宽度+1000
+      const endY = height + 1000 // 向下绘制到画布高度+1000
       
       // 绘制垂直线
-      for (let x = startX - gridSize * gridCount; x < startX + extendedWidth; x += gridSize) {
+      for (let x = startX; x <= endX; x += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(x, startY - gridSize * gridCount)
-        ctx.lineTo(x, startY + extendedHeight)
+        ctx.moveTo(x, startY)
+        ctx.lineTo(x, endY)
         ctx.stroke()
       }
       
       // 绘制水平线
-      for (let y = startY - gridSize * gridCount; y < startY + extendedHeight; y += gridSize) {
+      for (let y = startY; y <= endY; y += gridSize) {
         ctx.beginPath()
-        ctx.moveTo(startX - gridSize * gridCount, y)
-        ctx.lineTo(startX + extendedWidth, y)
+        ctx.moveTo(startX, y)
+        ctx.lineTo(endX, y)
         ctx.stroke()
       }
     },
