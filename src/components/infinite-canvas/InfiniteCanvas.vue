@@ -105,12 +105,17 @@ export default {
       ctx.strokeStyle = '#e0e0e0'
       ctx.lineWidth = 1
       
-      // 计算网格的起始位置，确保网格能够跟随平移
-      // 从负方向开始绘制，确保整个画布都有网格
-      const startX = -1000 // 向左绘制1000个单位
-      const startY = -1000 // 向上绘制1000个单位
-      const endX = width + 1000 // 向右绘制到画布宽度+1000
-      const endY = height + 1000 // 向下绘制到画布高度+1000
+      // 根据当前平移位置动态计算绘制范围
+      // 计算当前可见区域的边界
+      const viewportLeft = -this.translateX / this.scale
+      const viewportTop = -this.translateY / this.scale
+      
+      // 扩展绘制范围，确保拖拽时能看到足够的网格
+      const extendSize = 500 // 扩展500个单位的网格
+      const startX = Math.floor((viewportLeft - extendSize) / gridSize) * gridSize
+      const startY = Math.floor((viewportTop - extendSize) / gridSize) * gridSize
+      const endX = Math.ceil((viewportLeft + width + extendSize) / gridSize) * gridSize
+      const endY = Math.ceil((viewportTop + height + extendSize) / gridSize) * gridSize
       
       // 绘制垂直线
       for (let x = startX; x <= endX; x += gridSize) {
