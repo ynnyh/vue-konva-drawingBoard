@@ -98,12 +98,34 @@ export default {
       ctx.restore()
     },
     drawGrid(ctx) {
-      const gridSize = 20
+      // 根据缩放级别动态调整网格大小和线宽
+      let gridSize = 20
+      let lineWidth = 1
+      
+      // 当缩放级别很小时，增大网格大小和线宽
+      if (this.scale < 0.1) {
+        gridSize = 200
+        lineWidth = 2
+      } else if (this.scale < 0.01) {
+        gridSize = 2000
+        lineWidth = 3
+      } else if (this.scale < 0.0001) {
+        gridSize = 20000
+        lineWidth = 4
+      } else if (this.scale > 10) {
+        // 当缩放级别很大时，减小网格大小
+        gridSize = 5
+        lineWidth = 0.5
+      } else if (this.scale > 100) {
+        gridSize = 1
+        lineWidth = 0.2
+      }
+      
       const width = this.canvasWidth / this.scale
       const height = this.canvasHeight / this.scale
       
       ctx.strokeStyle = '#e0e0e0'
-      ctx.lineWidth = 1
+      ctx.lineWidth = lineWidth
       
       // 根据当前平移位置动态计算绘制范围
       // 计算当前可见区域的边界
@@ -111,7 +133,7 @@ export default {
       const viewportTop = -this.translateY / this.scale
       
       // 扩展绘制范围，确保拖拽时能看到足够的网格
-      const extendSize = 500 // 扩展500个单位的网格
+      const extendSize = 5000 // 扩展更大的范围，适应极端缩放
       const startX = Math.floor((viewportLeft - extendSize) / gridSize) * gridSize
       const startY = Math.floor((viewportTop - extendSize) / gridSize) * gridSize
       const endX = Math.ceil((viewportLeft + width + extendSize) / gridSize) * gridSize
@@ -255,7 +277,7 @@ export default {
     handleWheel(e) {
       e.preventDefault()
       const delta = e.deltaY > 0 ? -0.1 : 0.1
-      const newScale = Math.max(0.1, Math.min(5, this.scale * (1 + delta)))
+      const newScale = Math.max(0.00000001, Math.min(10000, this.scale * (1 + delta)))
       
       if (newScale !== this.scale) {
         const rect = this.$refs.canvas.getBoundingClientRect()
@@ -277,14 +299,14 @@ export default {
       }
     },
     zoomIn() {
-      const newScale = Math.min(5, this.scale * 1.2)
+      const newScale = Math.min(10000, this.scale * 1.2)
       if (newScale !== this.scale) {
         this.scale = newScale
         this.draw()
       }
     },
     zoomOut() {
-      const newScale = Math.max(0.1, this.scale / 1.2)
+      const newScale = Math.max(0.00000001, this.scale / 1.2)
       if (newScale !== this.scale) {
         this.scale = newScale
         this.draw()
