@@ -3,18 +3,30 @@
 [![在线预览](https://img.shields.io/badge/在线预览-GitHub%20Pages-brightgreen?style=for-the-badge)](https://ynnyh.github.io/vue-konva-drawingBoard/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-一个基于 Vue.js 和 Konva.js 构建的功能丰富的在线绘图工具，支持多种几何图形绘制、编辑和导出。
+一个基于 Vue.js 和 Konva.js 构建的功能丰富的在线绘图工具，支持多种几何图形绘制、编辑和导出，以及无限画布功能。
 
-**👉 [点击这里在线体验](https://ynnyh.github.io/vue-konva-drawingBoard/)**
+## 在线访问
+
+- **主画布页面**: [https://ynnyh.github.io/vue-konva-drawingBoard/#/](https://ynnyh.github.io/vue-konva-drawingBoard/#/)
+- **无限画布页面**: [https://ynnyh.github.io/vue-konva-drawingBoard/#/infinite](https://ynnyh.github.io/vue-konva-drawingBoard/#/infinite)
 
 ## 项目特性
 
+### 主画布功能
 - 支持多种图形绘制：矩形、椭圆、三角形、五边形、六边形、弧形、自由线条、文字
 - 图形选择与变换：支持单选和多选，可进行缩放、旋转、拖拽
 - 属性编辑：实时修改图形的描边、填充、旋转角度等属性
 - 智能对齐：元素移动时自动显示辅助对齐线
 - 图片导出：支持将画布导出为 PNG 图片
 - 键盘快捷键：支持 Delete 键删除选中图形
+
+### 无限画布功能
+- 无限空间：支持在无限大的画布上绘制和移动
+- 多种平移方式：鼠标中键拖拽、空格键+鼠标左键拖拽
+- 平滑缩放：支持滚轮缩放，缩放范围从 0.00000001x 到 10000x
+- 动态网格：随缩放级别自动调整网格大小和线宽
+- 坐标显示：实时显示鼠标在画布上的坐标位置
+- 重置视图：一键恢复到初始视图状态
 
 ## 技术栈
 
@@ -34,6 +46,9 @@
 src/
 ├── assets/           # 静态资源（样式、图标、图片）
 ├── components/       # 公共组件
+│   ├── infinite-canvas/  # 无限画布相关组件
+│   │   ├── InfiniteCanvas.vue  # 无限画布核心组件
+│   │   └── InfiniteToolBar.vue  # 无限画布工具栏
 ├── router/           # 路由配置
 ├── store/            # Vuex 状态管理
 │   ├── index.js      # Store 主文件
@@ -42,7 +57,8 @@ src/
 │   └── getters.js    # 状态获取
 ├── utils/            # 工具函数
 ├── views/            # 页面组件
-│   └── Konva.vue     # 绘图板主页面
+│   ├── Konva.vue     # 绘图板主页面
+│   └── InfiniteCanvasView.vue  # 无限画布页面
 ├── App.vue           # 根组件
 └── main.js           # 应用入口
 ```
@@ -98,7 +114,9 @@ npm run lint
 
 ## 使用指南
 
-### 绘图工具
+### 主画布使用
+
+#### 绘图工具
 
 | 工具 | 快捷操作 | 说明 |
 |------|---------|------|
@@ -112,7 +130,7 @@ npm run lint
 | 铅笔 | - | 自由绘制路径 |
 | 文字 | 双击编辑 | 添加文字 |
 
-### 快捷键
+#### 快捷键
 
 | 快捷键 | 功能 |
 |--------|------|
@@ -120,7 +138,7 @@ npm run lint
 | Shift + 拖拽 | 约束比例（矩形/椭圆） |
 | Ctrl/Cmd + 点击 | 多选图形 |
 
-### 属性编辑
+#### 属性编辑
 
 选中图形后，可在右侧属性栏修改：
 - 尺寸（宽度、高度、半径等）
@@ -128,6 +146,28 @@ npm run lint
 - 填充（开关、颜色）
 - 旋转角度
 - 是否可拖拽
+
+### 无限画布使用
+
+#### 基本操作
+
+| 操作 | 说明 |
+|------|------|
+| 鼠标滚轮 | 缩放画布 |
+| 鼠标中键拖拽 | 平移画布 |
+| 空格键 + 鼠标左键拖拽 | 平移画布 |
+| 点击 "重置视图" 按钮 | 恢复到初始视图 |
+
+#### 工具使用
+
+- 选择工具：选择和移动绘制的图形
+- 画笔工具：自由绘制路径
+- 文本工具：添加文字
+- 橡皮擦：擦除绘制的内容
+
+#### 笔刷设置
+
+可调整笔刷的粗细和颜色，以适应不同的绘制需求。
 
 ## 已知问题
 
@@ -155,5 +195,5 @@ npm run lint
 
 ---
 
-**项目版本**: 0.1.0  
-**最后更新**: 2021-01-21
+**项目版本**: 0.2.0  
+**最后更新**: 2024-01-01
